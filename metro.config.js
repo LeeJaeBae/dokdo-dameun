@@ -8,6 +8,11 @@
 module.exports = {
   transformer: {
     getTransformOptions: async () => ({
+      resolver:{
+        extraNodeModules: {
+          '@': __dirname + '/src',
+        },
+      },
       transform: {
         experimentalImportSupport: false,
         inlineRequires: true,

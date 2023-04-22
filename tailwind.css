@@ -1,0 +1,12 @@
+/* @tailwind base; */
+
+/* @tailwind components; */
+
+.font-sans {
+  font-family: 'Noto Sans KR', sans-serif;
+}
+
+.font-pretendard {
+  font-family: 'Pretendard', sans-serif;
+}
+
