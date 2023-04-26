@@ -7,17 +7,19 @@ import {faArrowDown} from '@fortawesome/free-solid-svg-icons';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {useNavigation} from '@react-navigation/native';
 import {useEffect, useState} from 'react';
-import {Dimensions, ImageSourcePropType, View} from 'react-native';
+import {Dimensions, View} from 'react-native';
 import {TouchableOpacity} from 'react-native-gesture-handler';
 import Carousel from 'react-native-reanimated-carousel';
 import styled from 'styled-components/native';
 import Gap from '@/atoms/containers/Gap';
 import api from '@/api/axios';
+import {useCategory} from '@/lib/context/CategoryContext';
 
 export default function AttractionDetail(props: any) {
     const width = Dimensions.get('window').width;
     const [index, setIndex] = useState(0);
     const navigation = useNavigation<any>();
+    const {selectedCategory, getUrl} = useCategory();
     const [open, setOpen] = useState(false);
     const [images, setImages] = useState([]);
     const handleClose = () => {
@@ -89,20 +91,24 @@ export default function AttractionDetail(props: any) {
                             <View />
                         )}
                     </ReviewContainer>
-                    <Button onPress={handleOpen}>
-                        <FlexGrow>
-                            <TextTiny color={theme.colors.white}>
-                                쿠폰 다운받기
-                            </TextTiny>
-                        </FlexGrow>
-                        <ArrowContainer>
-                            <FontAwesomeIcon
-                                icon={faArrowDown}
-                                size={20}
-                                color="white"
-                            />
-                        </ArrowContainer>
-                    </Button>
+                    {item.coupon ? (
+                        <Button onPress={handleOpen}>
+                            <FlexGrow>
+                                <TextTiny color={theme.colors.white}>
+                                    쿠폰 다운받기
+                                </TextTiny>
+                            </FlexGrow>
+                            <ArrowContainer>
+                                <FontAwesomeIcon
+                                    icon={faArrowDown}
+                                    size={20}
+                                    color="white"
+                                />
+                            </ArrowContainer>
+                        </Button>
+                    ) : (
+                        <View />
+                    )}
                 </ButtonContainer>
             </Content>
             {images && images.length > 0 ? (
@@ -110,18 +116,16 @@ export default function AttractionDetail(props: any) {
                     data={
                         // database[`${item.key}`][item.index[0]].items[item.index[1]]
                         //     .images
-                        images
+                        item.imagesUrl
                     }
                     renderItem={({item, index}) => {
                         return (
                             <Background
                                 loadingIndicatorSource={require('@assets/img/dae_pung1.png')}
                                 key={index}
-                                source={
-                                    item
-                                        ? {uri: item.image}
-                                        : require('@assets/img/dae_pung1.png')
-                                }
+                                source={{
+                                    uri: getUrl(item),
+                                }}
                             />
                         );
                     }}
@@ -129,24 +133,20 @@ export default function AttractionDetail(props: any) {
                     height={theme.scale.heightPercent(55)}
                 />
             ) : (
-                <Carousel<ImageSourcePropType>
+                <Carousel<any>
                     data={
                         // database[`${item.key}`][item.index[0]].items[item.index[1]]
                         //     .images
-                        [1]
+                        item.imagesUrl
                     }
                     renderItem={({item, index}) => {
                         return (
                             <Background
-                                // onLoad={() => {
-                                //
-                                // }}
+                                loadingIndicatorSource={require('@assets/img/dae_pung1.png')}
                                 key={index}
-                                source={
-                                    item
-                                        ? item
-                                        : require('@assets/img/dae_pung1.png')
-                                }
+                                source={{
+                                    uri: getUrl(item),
+                                }}
                             />
                         );
                     }}

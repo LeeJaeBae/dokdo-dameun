@@ -5,7 +5,6 @@ import Light from '@/atoms/text/Light';
 import TextLarge from '@/atoms/text/TextLarge';
 import TextNormal from '@/atoms/text/TextNormal';
 import TextSmall from '@/atoms/text/TextSmall';
-import breakWords from '@/lib/breakWords';
 import {theme} from '@/style/theme';
 import {faHeart} from '@fortawesome/free-regular-svg-icons';
 import {faHeart as faHeartOn} from '@fortawesome/free-solid-svg-icons';
@@ -14,6 +13,7 @@ import {useNavigation} from '@react-navigation/native';
 import {useState} from 'react';
 import {View} from 'react-native';
 import styled from 'styled-components/native';
+import {useCategory} from '@/lib/context/CategoryContext';
 
 type ListItemProps = {
     children?: React.ReactNode;
@@ -25,16 +25,15 @@ type ListItemProps = {
 export default function ItemLong(props: ListItemProps) {
     const [isLike, setIsLike] = useState(false);
     const navigation = useNavigation<any>();
+    const {getUrl} = useCategory();
     const {item} = props;
-    return (
+    return item ? (
         <BoxPaddingY>
             <Container>
                 <Background
-                    source={
-                        item.images.length > 0
-                            ? item.images[0]
-                            : require('@assets/img/hotel_background1.png')
-                    }>
+                    source={{
+                        uri: getUrl(item.url),
+                    }}>
                     <BackgroundFilter>
                         <LikeButton
                             onPress={() => {
@@ -57,11 +56,11 @@ export default function ItemLong(props: ListItemProps) {
                         <View>
                             <Gap size={10} />
                             <TextNormal color={theme.colors.white}>
-                                <Bold>{item.description}</Bold>
+                                <Bold>{item.tags}</Bold>
                             </TextNormal>
                             <Gap size={5} />
                             <TextSmall color={theme.colors.white}>
-                                {item.tags}
+                                {item.description}
                             </TextSmall>
                         </View>
                         <View>
@@ -70,7 +69,7 @@ export default function ItemLong(props: ListItemProps) {
                             </TextNormal>
                             <Gap size={2} />
                             <TextLarge color={theme.colors.white}>
-                                {breakWords(item.description, 19, 2)}
+                                {item.title}
                             </TextLarge>
                             <Gap size={15} />
                         </View>
@@ -90,6 +89,8 @@ export default function ItemLong(props: ListItemProps) {
                 </Background>
             </Container>
         </BoxPaddingY>
+    ) : (
+        <View />
     );
 }
 

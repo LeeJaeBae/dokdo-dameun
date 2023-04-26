@@ -9,6 +9,7 @@ import Gap from '@/atoms/containers/Gap';
 import {TAnimationStyle} from 'react-native-reanimated-carousel/lib/typescript/layouts/BaseLayout';
 import {interpolate} from 'react-native-reanimated';
 import api from '@/api/axios';
+import {useCategory} from '@/lib/context/CategoryContext';
 
 export default function CafeCategory(props: any) {
     const animationStyle: TAnimationStyle = useCallback((value: number) => {
@@ -28,14 +29,12 @@ export default function CafeCategory(props: any) {
     const mainCard = useRef<ICarouselInstance>(null);
 
     const navigation = props.navigation;
-    const [category, setCategory] = useState<any>({});
+    const {selectedCategory: category} = useCategory();
     const [data, setData] = useState<any>([]);
 
     useEffect(() => {
         api.get(`/category/${props.route.params.id}`).then(res => {
             if (res.data) {
-                setCategory(res.data);
-
                 if (res.data.subCategory && res.data.subCategory.length > 0) {
                     setData(res.data.subCategory);
                 } else {
@@ -118,9 +117,10 @@ export default function CafeCategory(props: any) {
                         width: theme.width,
                     }}
                     data={
-                        category.subCategory && category.subCategory.length > 1
-                            ? category.subCategory[1].items
-                            : []
+                        category.subCategory &&
+                        category.subCategory.find(
+                            (v: any) => v.name === 'recommend',
+                        ).items
                     }
                     renderItem={({item}) => (
                         <PromotionItem

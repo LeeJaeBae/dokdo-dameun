@@ -9,7 +9,7 @@ import styled from 'styled-components/native';
 import {Light} from '@/atoms/text';
 import TextSize from '@/atoms/text/TextSize';
 import {useEffect, useState} from 'react';
-import api from '@/api/axios';
+import {useCategory} from '@/lib/context/CategoryContext';
 
 type ListItemProps = {
     children?: React.ReactNode;
@@ -23,15 +23,10 @@ export default function ListItem(props: ListItemProps) {
     const [thumnail, setThumnail] = useState('');
     const [subtitle, setSubtitle] = useState('');
     const [description, setDescription] = useState<string>('');
-
+    const {getUrl} = useCategory();
     useEffect(() => {
         if (item.items.length > 0) {
-            api.get(`/item/${item.items[0].id}`).then(res => {
-                if (res.data) {
-                    setThumnail(res.data.images[0].image);
-                }
-            });
-
+            setThumnail(getUrl(item.items[0].imagesUrl[0]));
             setSubtitle(item.items[0].subtitle);
             setDescription(item.items[0].description);
         }
@@ -50,7 +45,7 @@ export default function ListItem(props: ListItemProps) {
                     resizeMode="contain"
                 />
                 <WriteVertical>
-                    <TextSize size={10}>{item.name}</TextSize>
+                    <TextSize size={9}>{item.name}</TextSize>
                 </WriteVertical>
                 <Number>
                     <Medium>{`${(props.index + 1).toLocaleString('KR', {
@@ -153,7 +148,7 @@ const Icon = styled.ImageBackground.attrs({
         props.theme.colors.setOpacity('0,0,0', 0.1)};
     overflow: hidden;
     margin-top: ${(props: any) => props.theme.scale.height(5)}px;
-    margin-bottom: ${(props: any) => props.theme.scale.height(15)}px;
+    margin-bottom: ${(props: any) => props.theme.scale.height(20)}px;
 `;
 
 const Number = styled.Text`

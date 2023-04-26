@@ -1,61 +1,27 @@
 import styled from 'styled-components/native';
 import {useEffect, useState} from 'react';
 import {Bold, TextNormal, TextSmall, TextTiny} from '@/atoms/text';
-import Carousel from 'react-native-reanimated-carousel';
 import {theme} from '@/style/theme';
 import FlexBox from '@/atoms/containers/FlexBox';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {faClock} from '@fortawesome/free-regular-svg-icons';
 import {faArrowDown, faPhoneVolume} from '@fortawesome/free-solid-svg-icons';
 import FlexGrow from '@/atoms/containers/FlexGrow';
-import ItemLong from '@/components/list/item/ItemLong';
-import api from '@/api/axios';
 import {View} from 'react-native';
 import CouponModal from '@/atoms/Modal/Coupon';
-
-const list = [
-    {
-        icon: require('@assets/icon/academy.png'),
-        title: '코스모스 리조트',
-        subTitle: '힐링 스테이',
-        description:
-            '웰컴키트 ㅣ 마운틴뷰 ㅣ 오션뷰 ㅣ 조식 ㅣ 카페 | 무료 셔틀 ㅣ 라이팅쇼 | 기프트 제공 ㅣ 굿즈',
-        backgroundImage: require('@assets/img/hotel_background1.png'),
-        category: '콘도, 리조트',
-    },
-    {
-        icon: require('@assets/icon/academy.png'),
-        title: '간편하게 즐기는 건나물 3종 세트',
-        subTitle: '울릉도에서만 특별한 건나물 할인',
-        description:
-            '울릉도산 건곤드레나물, 울릉도산 시래기 나물 그리고 울릉도산 건취나물',
-        backgroundImage: require('@assets/img/hotel_background2.png'),
-        category: '펜션, 리조트',
-    },
-];
+import {useCategory} from '@/lib/context/CategoryContext';
+import ItemLong from '@/components/list/item/ItemLong';
 
 export default function ListWithoutHeader(props: any) {
     const {params} = props.route;
     const navigation = props.navigation;
 
-    const [category, setCategory] = useState<any>({});
+    const {selectedCategory: category, getUrl} = useCategory();
     const [data, setData] = useState<any>([]);
 
     useEffect(() => {
-        api.get(`/category/${props.route.params.id}`).then(res => {
-            console.log(res);
-            if (res.data) {
-                setCategory(res.data);
-
-                console.log(res.data);
-
-                if (res.data.subCategory && res.data.subCategory.length > 0) {
-                    setData(res.data.subCategory);
-                } else {
-                    setData(res.data.items);
-                }
-            }
-        });
+        console.log(category);
+        setData(props.route.params.items);
     }, [props.route]);
 
     const [isModalVisible, setModalVisible] = useState(false);
@@ -63,8 +29,8 @@ export default function ListWithoutHeader(props: any) {
     return (
         <Container>
             {params.title === '숙소' &&
-                data.length > 0 &&
-                data.map((item, index) => {
+                category.items &&
+                category.items.map((item, index) => {
                     return (
                         <ItemLong
                             index={index}
@@ -80,17 +46,9 @@ export default function ListWithoutHeader(props: any) {
                 data.map((item: any, index: number) => (
                     <ItemContainer key={index}>
                         <ContentImage>
-                            <Carousel
-                                width={theme.width}
-                                data={item.images}
-                                renderItem={({item, index}) => {
-                                    return (
-                                        <Background
-                                            source={{uri: item.image}}
-                                            key={index}
-                                        />
-                                    );
-                                }}
+                            <Background
+                                source={{uri: getUrl(item.url)}}
+                                key={index}
                             />
                         </ContentImage>
                         <Content>
@@ -174,6 +132,7 @@ const ItemContainer = styled.View`
     height: ${(props: any) => props.theme.scale.width(400)}px;
     width: 100%;
     border: 1px solid ${(props: any) => props.theme.colors.border};
+    margin-bottom: ${(props: any) => props.theme.scale.width(15)}px;
 `;
 
 const Background = styled.ImageBackground.attrs({

@@ -1,5 +1,4 @@
 import TileContainer from '@/atoms/containers/TileContainer';
-import breakWords from '@/lib/breakWords';
 import GlobalStyle from '@/style/global';
 import {faAngleRight} from '@fortawesome/free-solid-svg-icons';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
@@ -9,6 +8,8 @@ import tailwind from 'twrnc';
 import {useEffect, useState} from 'react';
 import api from '@/api/axios';
 import {theme} from '@/style/theme';
+import {useCategory} from '@/lib/context/CategoryContext';
+import {TextSmall} from '@/atoms/text';
 
 export default function SingleList(props: any) {
     const navigation = props.navigation;
@@ -20,10 +21,18 @@ export default function SingleList(props: any) {
         api.get(`/category/${props.route.params.id}`).then(res => {
             if (res.data) {
                 setCategory(res.data);
-                setData(res.data.items);
+                // data sort by index
+
+                setData(
+                    res.data.items.sort((a: any, b: any) => {
+                        return a.index - b.index;
+                    }),
+                );
             }
         });
     }, [props.params]);
+
+    const {getUrl} = useCategory();
 
     return (
         <View style={tailwind`flex h-full flex-row px-4 gap-2`}>
@@ -36,19 +45,20 @@ export default function SingleList(props: any) {
                     const {color}: {color: string} = item;
                     return (
                         <TileContainer
+                            key={item.name}
                             isPadding={false}
                             gradient={
                                 color.split(',').length === 2
                                     ? color.split(',')
                                     : [color, color]
                             }
-                            height={theme.scale.width(200)}>
+                            height={theme.scale.width(180)}>
                             <View
                                 style={{
                                     position: 'absolute',
                                     width: '100%',
                                     height: theme.scale.width(130),
-                                    backgroundColor: 'yellow',
+                                    backgroundColor: color.split(',')[0],
                                 }}
                             />
                             <View
@@ -56,19 +66,17 @@ export default function SingleList(props: any) {
                                     position: 'absolute',
                                     width: '100%',
                                     height: theme.scale.width(70),
-                                    backgroundColor: 'red',
+                                    backgroundColor: color.split(',')[1],
                                     bottom: 0,
                                 }}
                             />
                             <ImageBackground
-                                source={
-                                    item.images.length > 0
-                                        ? item.images[0]
-                                        : require('@assets/logo.png')
-                                }
+                                source={{
+                                    uri: getUrl(item.url),
+                                }}
                                 style={{
                                     width: '100%',
-                                    height: 120,
+                                    height: 140,
                                     position: 'absolute',
                                     bottom: 0,
                                 }}
@@ -88,15 +96,19 @@ export default function SingleList(props: any) {
                                         paddingTop: 30,
                                     }}>
                                     <Text style={GlobalStyle.textLight}>
-                                        {item.subtitle}
+                                        {item.information[0]}
                                     </Text>
                                     <Text
                                         style={GlobalStyle.title}
                                         lineBreakMode="head">
-                                        {breakWords(item.title, 6)}
+                                        {item.information[1]}
                                     </Text>
                                 </View>
-
+                                <View>
+                                    <TextSmall size={12}>
+                                        {item.information[2]}
+                                    </TextSmall>
+                                </View>
                                 <View
                                     style={{
                                         display: 'flex',
@@ -114,6 +126,7 @@ export default function SingleList(props: any) {
                                             navigation.push('WaveDetail', {
                                                 id: item.id,
                                                 noBottom: true,
+                                                title: item.name,
                                             });
                                         }}>
                                         <View
@@ -148,7 +161,7 @@ export default function SingleList(props: any) {
                         </TileContainer>
                     );
                 }}
-                keyExtractor={item => item.toString()}
+                keyExtractor={item => item.name.toString()}
             />
         </View>
     );

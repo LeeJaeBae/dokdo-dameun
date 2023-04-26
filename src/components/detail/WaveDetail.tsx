@@ -1,6 +1,5 @@
 import CouponModal from '@/atoms/Modal/Coupon';
 import CouponeBtn from '@/atoms/buttons/CouponeBtn';
-import Box from '@/atoms/containers/Box';
 import BoxPaddingX from '@/atoms/containers/BoxPaddingX';
 import BoxPaddingY from '@/atoms/containers/BoxPaddingY';
 import CScrollView from '@/atoms/containers/CScrollView';
@@ -22,18 +21,20 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import React, {useEffect, useState} from 'react';
-import {Dimensions, Image, ImageBackground, View} from 'react-native';
+import {Dimensions, Image, ImageBackground, Linking, View} from 'react-native';
 import Carousel from 'react-native-reanimated-carousel';
 import tailwind from 'twrnc';
 import api from '@/api/axios';
+import {useCategory} from '@/lib/context/CategoryContext';
 
 export default function WaveDetail(props: any) {
     const [open, setOpen] = useState(false);
     const width = Dimensions.get('window').width;
     const {navigation} = props;
     const [category, setCategory] = useState<any>({});
-    const [data, setData] = useState<any>([]);
+    const [data, setData] = useState<any>();
     const [tags, setTags] = useState<string[]>([]);
+    const {noBottom} = props.route.params;
 
     useEffect(() => {
         api.get(`/item/${props.route.params.id}`).then(res => {
@@ -47,30 +48,32 @@ export default function WaveDetail(props: any) {
         });
     }, [props.route]);
 
+    const {getUrl} = useCategory();
+
     return data ? (
         <CScrollView>
             <WaveViewTop color="#4C2A6A" bgc="#fff">
-                <Box height="330px">
-                    <Carousel<any>
-                        width={width}
-                        height={theme.scale.width(240)}
-                        data={
-                            data.images && data.images.length > 0
-                                ? data.images
-                                : []
-                        }
-                        scrollAnimationDuration={1000}
-                        renderItem={({item, index}) => (
-                            <View key={index} style={tailwind`h-full`}>
-                                <Image
-                                    source={item}
-                                    style={tailwind`w-full h-full`}
-                                    resizeMode="cover"
-                                />
-                            </View>
-                        )}
-                    />
-                </Box>
+                <Carousel<any>
+                    width={width}
+                    loop={false}
+                    height={theme.scale.width(300)}
+                    data={
+                        noBottom ? data.imagesUrl : data.imagesUrl.slice(0, -2)
+                    }
+                    scrollAnimationDuration={1000}
+                    renderItem={({item, index}) => (
+                        <View key={index} style={tailwind`h-full`}>
+                            <Image
+                                source={{
+                                    uri: getUrl(item),
+                                }}
+                                style={tailwind`w-full h-full`}
+                                resizeMode="cover"
+                            />
+                        </View>
+                    )}
+                />
+
                 <View
                     style={{
                         width: '100%',
@@ -142,7 +145,13 @@ export default function WaveDetail(props: any) {
                             color={theme.colors.primary}
                         />
                         <TextSmall>
-                            {data.contact} <Bold>전화걸기</Bold>
+                            {data.contact}{' '}
+                            <Bold
+                                onPress={() => {
+                                    Linking.openURL(`tel:${data.contact}`);
+                                }}>
+                                전화걸기
+                            </Bold>
                         </TextSmall>
                     </FlexBox>
                     <FlexBox>
@@ -156,29 +165,47 @@ export default function WaveDetail(props: any) {
             </BoxPaddingX>
             {props.route.params.noBottom ? null : (
                 <>
-                    <WaveViewBottom color="#fff" bgc="#4C2A6A">
-                        <BoxPaddingX>
-                            <BoxPaddingY style={{paddingTop: 40, gap: 15}}>
-                                <TextLarge color={'#fff'}>
-                                    <Medium>{tags[1]}</Medium>
-                                </TextLarge>
-                                <TextLarge color={'#fff'}>{tags[2]}</TextLarge>
-                                <TextInformation color={'#fff'}>
-                                    <Underline>{tags[3]}</Underline>
-                                </TextInformation>
-                            </BoxPaddingY>
-                        </BoxPaddingX>
+                    <View
+                        style={{
+                            overflow: 'hidden',
+                        }}>
+                        <WaveViewBottom color="#fff" bgc="#4C2A6A">
+                            <BoxPaddingX>
+                                <BoxPaddingY
+                                    style={{
+                                        paddingTop: 40,
+                                        paddingHorizontal: 20,
+                                        gap: 15,
+                                    }}>
+                                    <TextLarge color={'#fff'}>
+                                        <Medium>{data.information[0]}</Medium>
+                                    </TextLarge>
+                                    <TextLarge color={'#fff'}>
+                                        {data.information[1]}
+                                    </TextLarge>
+                                    <TextInformation color={'#fff'}>
+                                        <Underline>
+                                            {data.information[2]}
+                                            {'\n'}
+                                            {data.information[3]}
+                                        </Underline>
+                                    </TextInformation>
+                                </BoxPaddingY>
+                            </BoxPaddingX>
+                        </WaveViewBottom>
                         <ImageBackground
                             style={{
                                 width: '100%',
                                 height: '100%',
                                 position: 'absolute',
-                                zIndex: -1,
+                                zIndex: 1,
                             }}
-                            source={require('@assets/img/food.png')}
+                            source={{
+                                uri: getUrl(data.imagesUrl.slice(-2)[0]),
+                            }}
                             resizeMode="cover"
                         />
-                    </WaveViewBottom>
+                    </View>
                     <FlexCenter height={110}>
                         <TextInformation>
                             {

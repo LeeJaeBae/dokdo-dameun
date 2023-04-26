@@ -5,12 +5,14 @@ type CategoryContextType = {
     categories: any[];
     selectedCategory: any;
     selectCategory: (category: any) => void;
+    getUrl: (url: string) => string;
 };
 
 const CategoryContext = createContext<CategoryContextType>({
     categories: [],
     selectedCategory: {},
     selectCategory: () => {},
+    getUrl: () => '',
 });
 
 export const CategoryProvider = (props: any) => {
@@ -33,6 +35,11 @@ export const CategoryProvider = (props: any) => {
                     return null;
                 }
                 setSelectedCategory(category);
+            },
+            getUrl: (url: string) => {
+                return `asset:/images/${selectedCategory.description}/${
+                    url.split('.')[0]
+                }.webp`;
             },
         };
     }, [categories, selectedCategory]);

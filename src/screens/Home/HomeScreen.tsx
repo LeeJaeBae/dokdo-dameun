@@ -99,13 +99,26 @@ export default function HomeScreen(props: any) {
                                 flex: 1,
                                 overflow: 'hidden',
                             }}>
-                            <Image
-                                source={item}
-                                style={{
-                                    width: '100%',
-                                    height: '100%',
-                                }}
-                            />
+                            <TouchableOpacity
+                                onPress={() => {
+                                    selectCategory(
+                                        '8b52c397-f27b-4cb2-b477-e982c6b18a7d',
+                                    );
+                                    navigation.navigate('Category', {
+                                        title: '기념품',
+                                        category: 'subVertical',
+                                        transparent: true,
+                                        id: '8b52c397-f27b-4cb2-b477-e982c6b18a7d',
+                                    });
+                                }}>
+                                <Image
+                                    source={item}
+                                    style={{
+                                        width: '100%',
+                                        height: '100%',
+                                    }}
+                                />
+                            </TouchableOpacity>
                         </View>
                     )}
                 />
@@ -220,10 +233,43 @@ export default function HomeScreen(props: any) {
                 ].map((item, index) => {
                     return (
                         <PromotionItem key={index} index={index}>
-                            <PromotionItemImage
-                                source={item}
-                                resizeMode={'contain'}
-                            />
+                            <TouchableOpacity
+                                onPress={() => {
+                                    if (index === 0) {
+                                        selectCategory(
+                                            '919692d8-ef99-4b57-92ed-86e7d9ceacaf',
+                                        );
+                                        navigation.navigate('Category', {
+                                            title: '관광명소',
+                                            category: 'subHorizontal',
+                                            transparent: true,
+                                            id: '919692d8-ef99-4b57-92ed-86e7d9ceacaf',
+                                        });
+                                    } else if (index === 1) {
+                                        selectCategory(
+                                            '432b669c-4249-4851-8f67-437b593c7c42',
+                                        );
+                                        navigation.navigate('Category', {
+                                            title: '숙소',
+                                            category: 'flat',
+                                            id: '432b669c-4249-4851-8f67-437b593c7c42',
+                                        });
+                                    } else {
+                                        selectCategory(
+                                            'd1357089-c137-4415-a170-5bd533ba5d30',
+                                        );
+                                        navigation.navigate('Category', {
+                                            title: '안주거리',
+                                            category: 'tile',
+                                            id: 'd1357089-c137-4415-a170-5bd533ba5d30',
+                                        });
+                                    }
+                                }}>
+                                <PromotionItemImage
+                                    source={item}
+                                    resizeMode={'contain'}
+                                />
+                            </TouchableOpacity>
                         </PromotionItem>
                     );
                 })}

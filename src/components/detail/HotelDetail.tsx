@@ -1,40 +1,36 @@
 import FlexBox from '@/atoms/containers/FlexBox';
-import FlexColumn from '@/atoms/containers/FlexColumn';
 import Gap from '@/atoms/containers/Gap';
-import ImageCircle from '@/atoms/containers/ImageCircle';
-import Bold from '@/atoms/text/Bold';
-import LSpacing from '@/atoms/text/LSpacing';
 import SemiBold from '@/atoms/text/SemiBold';
 import Text14 from '@/atoms/text/Text14';
 import TextLarge from '@/atoms/text/TextLarge';
 import TextNormal from '@/atoms/text/TextNormal';
-import TextSize from '@/atoms/text/TextSize';
 import TextSmall from '@/atoms/text/TextSmall';
 import TextTiny from '@/atoms/text/TextTiny';
 import WriteVerticalReverse from '@/atoms/text/WriteVerticalReverse';
-import breakWords from '@/lib/breakWords';
 import {theme} from '@/style/theme';
 
 import {
     faBanSmoking,
     faSquareParking,
-    faStar,
     faWifi,
 } from '@fortawesome/free-solid-svg-icons';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {useEffect, useState} from 'react';
-import {Dimensions, TouchableWithoutFeedback, View} from 'react-native';
+import {Dimensions, View} from 'react-native';
 import Carousel from 'react-native-reanimated-carousel';
 import {Shadow} from 'react-native-shadow-2';
 import styled from 'styled-components/native';
 import api from '@/api/axios';
+import {useCategory} from '@/lib/context/CategoryContext';
 
 export default function HotelDetail(props: any) {
     const width = Dimensions.get('window').width;
     const [index, setIndex] = useState(0);
     const {navigation} = props;
 
-    const [item, setItem] = useState<any>([]);
+    const [item, setItem] = useState<any>();
+
+    const {getUrl} = useCategory();
 
     useEffect(() => {
         api.get(`/item/${props.route.params.id}`).then(res => {
@@ -42,7 +38,7 @@ export default function HotelDetail(props: any) {
                 setItem(res.data);
             }
         });
-    }, []);
+    }, [props.route]);
 
     return item ? (
         <Container showsVerticalScrollIndicator={false}>
@@ -52,18 +48,15 @@ export default function HotelDetail(props: any) {
                     width={width}
                     height={theme.scale.height(100)}
                     defaultIndex={0}
-                    data={
-                        item.images && item.images.length > 0
-                            ? item.images
-                            : [
-                                  require('@assets/banner.png'),
-                                  require('@assets/banner.png'),
-                                  require('@assets/banner.png'),
-                              ]
-                    }
+                    data={item.imagesUrl}
                     scrollAnimationDuration={1000}
                     renderItem={({item, index}) => (
-                        <ImageItem key={index} source={item} />
+                        <ImageItem
+                            key={index}
+                            source={{
+                                uri: getUrl(item),
+                            }}
+                        />
                     )}
                     onSnapToItem={index => {
                         setIndex(index);
@@ -72,24 +65,22 @@ export default function HotelDetail(props: any) {
             </CarouselContainer>
             <TextContainer>
                 <TextLarge>
-                    <Bold>
-                        <LSpacing>{item.title}</LSpacing>
-                    </Bold>
+                    <SemiBold>{item.title}</SemiBold>
                 </TextLarge>
                 <Text14>{item.address}</Text14>
             </TextContainer>
             <TextContainer>
-                <TextNormal>{item.tags && item.tags.split('/')[0]}</TextNormal>
-                <TextSmall>{item.tags && item.tags.split('/')[1]}</TextSmall>
+                <TextNormal>{item.information[0]}</TextNormal>
+                <TextSmall>{item.information[1]}</TextSmall>
                 <Gap size={5} />
                 <TextSmall color={theme.colors.primary}>
-                    {item.tags && item.tags.split('/')[2]}
+                    객실크기 : {item.information[2]}㎡
                 </TextSmall>
                 <TextSmall color={theme.colors.primary}>
-                    {item.tags && item.tags.split('/')[3]}
+                    객실구성 : {item.information[3]}
                 </TextSmall>
                 <TextSmall color={theme.colors.primary}>
-                    {item.tags && item.tags.split('/')[4]}
+                    수용인원 : {item.information[4]}
                 </TextSmall>
             </TextContainer>
             <TextContainer>
@@ -98,16 +89,14 @@ export default function HotelDetail(props: any) {
                 </PromotionContainer>
                 <CouponContainer>
                     <TextLarge>
-                        <SemiBold>
-                            {breakWords(
-                                (item.coupon && item.coupon.title) || '',
-                                10,
-                            )}
-                        </SemiBold>
+                        <SemiBold>{item.title}</SemiBold>
+                        {'\n'}
+                        <TextNormal>{item.information[5]} 할인 쿠폰</TextNormal>
                     </TextLarge>
                     <Gap size={5} />
                     <TextSmall>
-                        {item.coupon && item.coupon.description}
+                        {' '}
+                        {item.information[5]} 현장 결제 시 10,000원 즉시 할인
                     </TextSmall>
                     <Gap size={5} />
                     <TextTiny>{item.coupon && item.coupon.subtitle}</TextTiny>
@@ -155,41 +144,41 @@ export default function HotelDetail(props: any) {
                 </FlexBox>
             </TextContainer>
             <TextContainer>
-                <FlexBox>
-                    <FontAwesomeIcon icon={faStar} />
-                    <TextNormal>4.5</TextNormal>
-                    <TextNormal>·</TextNormal>
-                    <TextNormal>후기 {item.reviews.length}개</TextNormal>
-                </FlexBox>
-                <ReviewContainer>
-                    {Array(3)
-                        .fill(0)
-                        .map((_, i) => (
-                            <ImgShadow
-                                key={i}
-                                index={i}
-                                offset={[-20 * i, 3]}
-                                distance={5}
-                                startColor={theme.colors.shadow}>
-                                <ImageCircle
-                                    index={i}
-                                    source={require('@assets/icon/tip.png')}
-                                />
-                            </ImgShadow>
-                        ))}
-                    <TouchableWithoutFeedback
-                        onPress={() =>
-                            navigation.navigate('Review', {item: 'test'})
-                        }>
-                        <FlexColumn>
-                            <Text14>
-                                <SemiBold>+{item.reviews.length}</SemiBold>
-                            </Text14>
-                            <TextSize size={10}>더보기</TextSize>
-                        </FlexColumn>
-                    </TouchableWithoutFeedback>
-                </ReviewContainer>
-                <Gap size={10} />
+                {/*<FlexBox>*/}
+                {/*    <FontAwesomeIcon icon={faStar} />*/}
+                {/*    <TextNormal>4.5</TextNormal>*/}
+                {/*    <TextNormal>·</TextNormal>*/}
+                {/*    <TextNormal>후기 {item.reviews.length}개</TextNormal>*/}
+                {/*</FlexBox>*/}
+                {/*<ReviewContainer>*/}
+                {/*    {Array(3)*/}
+                {/*        .fill(0)*/}
+                {/*        .map((_, i) => (*/}
+                {/*            <ImgShadow*/}
+                {/*                key={i}*/}
+                {/*                index={i}*/}
+                {/*                offset={[-20 * i, 3]}*/}
+                {/*                distance={5}*/}
+                {/*                startColor={theme.colors.shadow}>*/}
+                {/*                <ImageCircle*/}
+                {/*                    index={i}*/}
+                {/*                    source={require('@assets/icon/tip.png')}*/}
+                {/*                />*/}
+                {/*            </ImgShadow>*/}
+                {/*        ))}*/}
+                {/*    <TouchableWithoutFeedback*/}
+                {/*        onPress={() =>*/}
+                {/*            navigation.navigate('Review', {item: 'test'})*/}
+                {/*        }>*/}
+                {/*        <FlexColumn>*/}
+                {/*            <Text14>*/}
+                {/*                <SemiBold>+{item.reviews.length}</SemiBold>*/}
+                {/*            </Text14>*/}
+                {/*            <TextSize size={10}>더보기</TextSize>*/}
+                {/*        </FlexColumn>*/}
+                {/*    </TouchableWithoutFeedback>*/}
+                {/*</ReviewContainer>*/}
+                {/*<Gap size={10} />*/}
             </TextContainer>
         </Container>
     ) : (
@@ -241,7 +230,7 @@ const PromotionContainer = styled.View`
 
 const CouponContainer = styled.View`
     width: 100%;
-    height: ${theme.scale.calc(600)}px;
+    height: ${theme.scale.width(150)}px;
     background-color: ${theme.colors.brown};
     overflow: hidden;
     padding: ${theme.scale.calc(100)}px;

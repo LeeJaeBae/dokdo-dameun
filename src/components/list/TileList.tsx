@@ -12,26 +12,30 @@ import BoxPaddingX from '@/atoms/containers/BoxPaddingX';
 import BoxPaddingY from '@/atoms/containers/BoxPaddingY';
 import Gap from '@/atoms/containers/Gap';
 import {theme} from '@/style/theme';
+import {useCategory} from '@/lib/context/CategoryContext';
 
 export default function TileList(props: any) {
     const navigation = props.navigation;
-    const [category, setCategory] = useState<any>({});
-    const [data, setData] = useState<any>([]);
+
+    const [data, setData] = useState<any>();
     const [right, setRight] = useState<any>([]);
 
     useEffect(() => {
-        console.log(props);
         api.get(`/category/${props.route.params.id}`).then(res => {
             if (res.data) {
-                setCategory(res.data);
-                const half = Math.ceil(res.data.items.length / 2);
-                setData(res.data.items.slice(0, half));
-                setRight(res.data.items.slice(half));
+                // data divide / 2
+                const _data = res.data.items;
+                const _right = _data.splice(Math.ceil(_data.length / 2));
+
+                setData(_data);
+                setRight(_right);
             }
         });
     }, [props.params]);
 
-    return (
+    const {getUrl} = useCategory();
+
+    return data ? (
         <View style={tailwind`flex h-full flex-row px-4 gap-2`}>
             <FlatList
                 style={tailwind`flex-1 flex w-full flex-col`}
@@ -56,7 +60,7 @@ export default function TileList(props: any) {
                         >
                             <ImageBackground
                                 source={{
-                                    uri: item.information.slice(4).join(),
+                                    uri: getUrl(item.url),
                                 }}
                                 style={{
                                     width: '100%',
@@ -167,7 +171,7 @@ export default function TileList(props: any) {
                         >
                             <ImageBackground
                                 source={{
-                                    uri: item.information.slice(4).join(),
+                                    uri: getUrl(item.url),
                                 }}
                                 style={{
                                     width: '100%',
@@ -256,5 +260,7 @@ export default function TileList(props: any) {
                 keyExtractor={item => item.toString()}
             />
         </View>
+    ) : (
+        <View />
     );
 }

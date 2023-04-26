@@ -11,7 +11,7 @@ import {useCategory} from '@/lib/context/CategoryContext';
 
 export default function HorizontalList(props: any) {
     const navigation = props.navigation;
-    const {selectedCategory} = useCategory();
+    const {selectedCategory, getUrl} = useCategory();
     const data = useMemo(() => {
         return props.item.items;
     }, [selectedCategory]);
@@ -74,7 +74,7 @@ export default function HorizontalList(props: any) {
                                     //     height: theme.scale.calc(950),
                                     // }}
                                     source={{
-                                        uri: 'asset:/images/1. 관광명소/1. 도동/1. 섬일주유람선/섬일주유람선-1.jpg',
+                                        uri: getUrl(item.imagesUrl[0]),
                                     }}>
                                     <TouchableOpacity
                                         onPress={() => {
