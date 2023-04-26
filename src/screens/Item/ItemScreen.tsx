@@ -7,7 +7,7 @@ export default function ItemScreen(props: any) {
     const {detailType} = props.route.params;
     const detail = useMemo(() => {
         if (detailType && detailType === 'hotel') {
-            return <HotelDetail />;
+            return <HotelDetail {...props} />;
         } else if (detailType === 'attraction') {
             return <AttractionTitle />;
         } else {

@@ -18,22 +18,23 @@ import styled from 'styled-components/native';
 type ListItemProps = {
     children?: React.ReactNode;
     onPress?: () => void;
-    icon: string;
-    title: string;
-    subtitle: string;
-    description: string;
-    backgroundImage: string;
     index: number;
-    category: string;
+    item: any;
 };
 
 export default function ItemLong(props: ListItemProps) {
     const [isLike, setIsLike] = useState(false);
     const navigation = useNavigation<any>();
+    const {item} = props;
     return (
         <BoxPaddingY>
             <Container>
-                <Background source={props.backgroundImage}>
+                <Background
+                    source={
+                        item.images.length > 0
+                            ? item.images[0]
+                            : require('@assets/img/hotel_background1.png')
+                    }>
                     <BackgroundFilter>
                         <LikeButton
                             onPress={() => {
@@ -56,28 +57,29 @@ export default function ItemLong(props: ListItemProps) {
                         <View>
                             <Gap size={10} />
                             <TextNormal color={theme.colors.white}>
-                                <Bold>{props.category}</Bold>
+                                <Bold>{item.description}</Bold>
                             </TextNormal>
                             <Gap size={5} />
                             <TextSmall color={theme.colors.white}>
-                                {breakWords(props.description, 19, 2)}
+                                {item.tags}
                             </TextSmall>
                         </View>
                         <View>
                             <TextNormal color={theme.colors.white}>
-                                {props.subtitle}
+                                {item.subtitle}
                             </TextNormal>
                             <Gap size={2} />
                             <TextLarge color={theme.colors.white}>
-                                {breakWords(props.title, 19, 2)}
+                                {breakWords(item.description, 19, 2)}
                             </TextLarge>
                             <Gap size={15} />
                         </View>
                         <OverViewBtn
                             onPress={() => {
                                 navigation.navigate('Item', {
-                                    title: props.title,
+                                    title: item.title,
                                     detailType: 'hotel',
+                                    id: item.id,
                                 });
                             }}>
                             <TextNormal color={theme.colors.white}>

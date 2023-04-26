@@ -2,12 +2,13 @@ import styled from 'styled-components/native';
 import {Light, TextLarge, TextNormal, TextSmall, TextTiny} from '@/atoms/text';
 import {theme} from '@/style/theme';
 import TextSize from '@/atoms/text/TextSize';
-import React, {useCallback, useRef} from 'react';
+import React, {useCallback, useEffect, useRef, useState} from 'react';
 import Carousel, {ICarouselInstance} from 'react-native-reanimated-carousel';
 import {Platform, StatusBar, View} from 'react-native';
 import Gap from '@/atoms/containers/Gap';
 import {TAnimationStyle} from 'react-native-reanimated-carousel/lib/typescript/layouts/BaseLayout';
 import {interpolate} from 'react-native-reanimated';
+import api from '@/api/axios';
 
 export default function CafeCategory(props: any) {
     const animationStyle: TAnimationStyle = useCallback((value: number) => {
@@ -26,6 +27,24 @@ export default function CafeCategory(props: any) {
     const titleCard = useRef<ICarouselInstance>(null);
     const mainCard = useRef<ICarouselInstance>(null);
 
+    const navigation = props.navigation;
+    const [category, setCategory] = useState<any>({});
+    const [data, setData] = useState<any>([]);
+
+    useEffect(() => {
+        api.get(`/category/${props.route.params.id}`).then(res => {
+            if (res.data) {
+                setCategory(res.data);
+
+                if (res.data.subCategory && res.data.subCategory.length > 0) {
+                    setData(res.data.subCategory);
+                } else {
+                    setData(res.data.items);
+                }
+            }
+        });
+    }, [props.route]);
+
     return (
         <Container>
             {Platform.OS === 'ios' && <StatusBar barStyle="light-content" />}
@@ -39,27 +58,43 @@ export default function CafeCategory(props: any) {
                 <TextNormal color={theme.colors.white}>
                     <Light>지금이 아니면 놓치고 말 거예요!</Light>
                 </TextNormal>
-                <Carousel
+                <Carousel<any>
                     width={theme.width * 0.7}
                     style={{
                         width: theme.width,
                         position: 'absolute',
                         top: theme.scale.width(200),
                     }}
-                    data={[1, 2, 3]}
-                    renderItem={() => (
-                        <HeaderItemWrapper>
+                    data={
+                        category.subCategory && category.subCategory.length > 0
+                            ? category.subCategory[0].items
+                            : []
+                    }
+                    renderItem={({item}) => (
+                        <HeaderItemWrapper
+                            onPress={() => {
+                                navigation.navigate('CafeDetail', {
+                                    id: item.id,
+                                });
+                            }}>
                             <HeaderItem
-                                source={require('@assets/img/cafe_background.png')}>
+                                source={
+                                    item.information.length > 0 &&
+                                    item.information[0].includes('base64')
+                                        ? {
+                                              uri: item.information.join(),
+                                          }
+                                        : require('@assets/img/cafe_background.png')
+                                }>
                                 <HeaderItemFilter>
                                     <TextSmall color={theme.colors.white}>
-                                        울릉도 대표 간식
+                                        {item.subtitle}
                                     </TextSmall>
                                     <TextSize
                                         fontWeight={700}
                                         size={20}
                                         color={theme.colors.white}>
-                                        저동커피{'\n'}오징어 먹물 아이스크림
+                                        {item.title}
                                     </TextSize>
                                 </HeaderItemFilter>
                             </HeaderItem>
@@ -73,30 +108,45 @@ export default function CafeCategory(props: any) {
                         padding: theme.scale.width(10),
                     }}>
                     <TextSize size={18} fontWeight={700}>
-                        오늘의 추천
+                        이번 주 최고의 간식
                     </TextSize>
                 </View>
 
-                <Carousel
+                <Carousel<any>
                     width={theme.scale.width(160)}
                     style={{
                         width: theme.width,
                     }}
-                    data={[1, 2, 3, 4]}
-                    renderItem={() => (
-                        <PromotionItem>
+                    data={
+                        category.subCategory && category.subCategory.length > 1
+                            ? category.subCategory[1].items
+                            : []
+                    }
+                    renderItem={({item}) => (
+                        <PromotionItem
+                            onPress={() => {
+                                navigation.navigate('CafeDetail', {
+                                    id: item.id,
+                                });
+                            }}>
                             <PromotionImage
-                                source={require('@assets/img/cafe_background.png')}
+                                source={
+                                    item.information.length > 0
+                                        ? {uri: item.information.join()}
+                                        : require('@assets/img/cafe_background.png')
+                                }
                             />
                             <PromotionInfo>
-                                <TextSmall fontWeight={700}>뉴욕뉴욕</TextSmall>
+                                <TextSmall fontWeight={700}>
+                                    {item.title}
+                                </TextSmall>
                                 <TextTiny color={theme.colors.gray}>
-                                    #미국식핫도그
+                                    {item.description}
                                 </TextTiny>
                                 <TextSmall
                                     fontWeight={600}
                                     color={theme.colors.purple}>
-                                    2,000원 할인쿠폰
+                                    {item.subtitle}
                                 </TextSmall>
                             </PromotionInfo>
                         </PromotionItem>
@@ -108,11 +158,15 @@ export default function CafeCategory(props: any) {
                 <TextSize size={16} fontWeight={700}>
                     오늘, 이 카페 어때요?
                 </TextSize>
-                <Carousel
+                <Carousel<any>
                     ref={mainCard}
                     width={theme.width}
                     height={theme.scale.width(250)}
-                    data={[1, 2]}
+                    data={
+                        category.subCategory && category.subCategory.length > 2
+                            ? category.subCategory[2].items
+                            : []
+                    }
                     loop
                     mode="parallax"
                     modeConfig={{
@@ -134,13 +188,18 @@ export default function CafeCategory(props: any) {
                                     alignItems: 'center',
                                 }}>
                                 <RecommendImage
-                                    source={require('@assets/img/cafe_background.png')}
+                                    source={
+                                        item.information &&
+                                        item.information.length > 0
+                                            ? {uri: item.information.join()}
+                                            : require('@assets/img/cafe_background.png')
+                                    }
                                 />
                             </View>
                         );
                     }}
                 />
-                <Carousel
+                <Carousel<any>
                     ref={titleCard}
                     style={{
                         width: theme.width,
@@ -151,12 +210,16 @@ export default function CafeCategory(props: any) {
                         top: theme.scale.width(200),
                     }}
                     width={theme.width * 0.7}
-                    data={[1, 2, 3, 4, 5, 6]}
+                    data={
+                        category.subCategory && category.subCategory.length > 2
+                            ? category.subCategory[2].items
+                            : []
+                    }
                     customAnimation={animationStyle}
                     panGestureHandlerProps={{
                         activeOffsetX: [-999, 999],
                     }}
-                    renderItem={({index}) => {
+                    renderItem={({item, index}) => {
                         return (
                             <View
                                 style={{
@@ -164,12 +227,17 @@ export default function CafeCategory(props: any) {
                                     justifyContent: 'center',
                                     alignItems: 'center',
                                 }}>
-                                <RecommendTitle>
+                                <RecommendTitle
+                                    onPress={() => {
+                                        navigation.navigate('CafeDetail', {
+                                            id: item.id,
+                                        });
+                                    }}>
                                     <TextSize size={18} fontWeight={700}>
-                                        팔레트
+                                        {item.title}
                                     </TextSize>
                                     <TextSmall color={theme.colors.gray}>
-                                        #커피 #디저트
+                                        {item.subtitle}
                                     </TextSmall>
                                 </RecommendTitle>
                             </View>
@@ -263,11 +331,11 @@ const RecommendImage = styled.Image`
     overflow: hidden;
 `;
 
-const RecommendTitle = styled.View.attrs({
+const RecommendTitle = styled.TouchableOpacity.attrs({
     elevation: 5,
 })`
     flex: 1;
-    width: 90%;
+    width: 100%;
     height: 100%;
     margin-bottom: ${(props: any) => props.theme.scale.width(10)}px;
     border-radius: ${(props: any) => props.theme.scale.width(5)}px;

@@ -8,26 +8,49 @@ import {theme} from '@/style/theme';
 import styled from 'styled-components/native';
 import {Light} from '@/atoms/text';
 import TextSize from '@/atoms/text/TextSize';
+import {useEffect, useState} from 'react';
+import api from '@/api/axios';
 
 type ListItemProps = {
     children?: React.ReactNode;
     onPress?: () => void;
-    icon: string;
-    title: string;
-    subtitle: string;
-    description: string;
-    backgroundImage: string;
+    item: any;
     index: number;
 };
 
 export default function ListItem(props: ListItemProps) {
-    console.log(props.subtitle);
+    const {item} = props;
+    const [thumnail, setThumnail] = useState('');
+    const [subtitle, setSubtitle] = useState('');
+    const [description, setDescription] = useState<string>('');
+
+    useEffect(() => {
+        if (item.items.length > 0) {
+            api.get(`/item/${item.items[0].id}`).then(res => {
+                if (res.data) {
+                    setThumnail(res.data.images[0].image);
+                }
+            });
+
+            setSubtitle(item.items[0].subtitle);
+            setDescription(item.items[0].description);
+        }
+    }, [item]);
     return (
         <Container onPress={props.onPress}>
             <Left>
-                <Icon source={props.icon} resizeMode="contain" />
+                <Icon
+                    source={
+                        thumnail
+                            ? {
+                                  uri: thumnail,
+                              }
+                            : require('@assets/icon/academy.png')
+                    }
+                    resizeMode="contain"
+                />
                 <WriteVertical>
-                    <TextSize size={10}>{props.title}</TextSize>
+                    <TextSize size={10}>{item.name}</TextSize>
                 </WriteVertical>
                 <Number>
                     <Medium>{`${(props.index + 1).toLocaleString('KR', {
@@ -36,19 +59,27 @@ export default function ListItem(props: ListItemProps) {
                 </Number>
             </Left>
             <Right>
-                <Background blurRadius={1} source={props.backgroundImage}>
+                <Background
+                    blurRadius={1}
+                    source={
+                        thumnail
+                            ? {
+                                  uri: thumnail,
+                              }
+                            : require('@assets/icon/academy.png')
+                    }>
                     <BackgroundFilter>
                         <TextSmall color={theme.colors.white}>
                             Spacial Product
                         </TextSmall>
                         <TextSize size={20} color={theme.colors.white}>
                             <Light>
-                                <LSpacing>{props.subtitle}</LSpacing>
+                                <LSpacing>{subtitle}</LSpacing>
                             </Light>
                         </TextSize>
                         <Gap size={2} />
                         <TextTiny color={theme.colors.white}>
-                            {props.description}
+                            {description}
                         </TextTiny>
                     </BackgroundFilter>
                 </Background>

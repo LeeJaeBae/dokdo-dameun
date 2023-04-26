@@ -13,18 +13,21 @@ import {TailwindProvider} from 'tailwind-rn/dist';
 import RootComponent from './src';
 import utilities from './tailwind.json';
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
+import {CategoryProvider} from '@/lib/context/CategoryContext';
 
 function App(): JSX.Element {
     return (
         // @ts-ignore
         <TailwindProvider utilities={utilities}>
             <ThemeProvider theme={theme}>
-                <GestureHandlerRootView
-                    style={{
-                        flex: 1,
-                    }}>
-                    <RootComponent />
-                </GestureHandlerRootView>
+                <CategoryProvider>
+                    <GestureHandlerRootView
+                        style={{
+                            flex: 1,
+                        }}>
+                        <RootComponent />
+                    </GestureHandlerRootView>
+                </CategoryProvider>
             </ThemeProvider>
         </TailwindProvider>
     );

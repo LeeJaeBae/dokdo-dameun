@@ -1,6 +1,5 @@
-import {useNavigation} from '@react-navigation/native';
 import styled from 'styled-components/native';
-import {useMemo} from 'react';
+import {useEffect, useState} from 'react';
 import {Bold, TextNormal, TextSmall, TextTiny} from '@/atoms/text';
 import Carousel from 'react-native-reanimated-carousel';
 import {theme} from '@/style/theme';
@@ -9,8 +8,10 @@ import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {faClock} from '@fortawesome/free-regular-svg-icons';
 import {faArrowDown, faPhoneVolume} from '@fortawesome/free-solid-svg-icons';
 import FlexGrow from '@/atoms/containers/FlexGrow';
-import database from '@/lib/database';
 import ItemLong from '@/components/list/item/ItemLong';
+import api from '@/api/axios';
+import {View} from 'react-native';
+import CouponModal from '@/atoms/Modal/Coupon';
 
 const list = [
     {
@@ -35,102 +36,129 @@ const list = [
 
 export default function ListWithoutHeader(props: any) {
     const {params} = props.route;
+    const navigation = props.navigation;
 
-    const navigation = useNavigation<any>();
+    const [category, setCategory] = useState<any>({});
+    const [data, setData] = useState<any>([]);
 
-    const items = useMemo(() => {
-        if (params.items && params.items.length > 0) {
-            return params.items;
-        }
-        if (params.title === '카페·먹거리') {
-            return database.cafe;
-        }
-    }, [params]);
+    useEffect(() => {
+        api.get(`/category/${props.route.params.id}`).then(res => {
+            console.log(res);
+            if (res.data) {
+                setCategory(res.data);
+
+                console.log(res.data);
+
+                if (res.data.subCategory && res.data.subCategory.length > 0) {
+                    setData(res.data.subCategory);
+                } else {
+                    setData(res.data.items);
+                }
+            }
+        });
+    }, [props.route]);
+
+    const [isModalVisible, setModalVisible] = useState(false);
 
     return (
         <Container>
-            {params.title === '호텔' &&
-                list.map((item, index) => {
+            {params.title === '숙소' &&
+                data.length > 0 &&
+                data.map((item, index) => {
                     return (
                         <ItemLong
                             index={index}
                             key={index}
-                            icon={item.icon}
-                            title={item.title}
-                            subtitle={item.subTitle}
-                            description={item.description}
-                            backgroundImage={item.backgroundImage}
+                            item={item}
                             onPress={() => {
                                 navigation.navigate('Item');
                             }}
-                            category={item.category}
                         />
                     );
                 })}
-            {items.map((item: any, index: number) => (
-                <ItemContainer key={index}>
-                    <ContentImage>
-                        <Carousel
-                            width={theme.width}
-                            data={item.images}
-                            renderItem={({item, index}) => {
-                                return <Background source={item} key={index} />;
-                            }}
-                        />
-                    </ContentImage>
-                    <Content>
-                        <Header>
-                            <TextNormal>
-                                <Bold>{item.name}</Bold>
-                            </TextNormal>
-                            <TextSmall>{item.address}</TextSmall>
-                        </Header>
-                        <Footer>
-                            <FlexBox>
-                                <FontAwesomeIcon
-                                    icon={faClock}
-                                    size={12}
-                                    color={theme.colors.darkGray}
-                                />
-                                <TextSmall>{item.time}</TextSmall>
-                            </FlexBox>
-                            <FlexBox>
-                                <FontAwesomeIcon
-                                    icon={faPhoneVolume}
-                                    size={12}
-                                    color={theme.colors.darkGray}
-                                />
-                                <TextSmall>{item.contact}</TextSmall>
-                            </FlexBox>
-                            <FlexBox>
-                                <FontAwesomeIcon
-                                    icon={faClock}
-                                    size={12}
-                                    color={theme.colors.darkGray}
-                                />
-                                <TextSmall>
-                                    {item.inforamtion &&
-                                        item.information.join(' · ')}
-                                </TextSmall>
-                            </FlexBox>
-                            <Button backgroundColor={theme.colors.green}>
-                                <FlexGrow>
-                                    <TextTiny color={theme.colors.white}>
-                                        쿠폰 다운받기
-                                    </TextTiny>
-                                </FlexGrow>
-                                <ArrowContainer>
+            {data && data.length > 0 && params.title !== '숙소' ? (
+                data.map((item: any, index: number) => (
+                    <ItemContainer key={index}>
+                        <ContentImage>
+                            <Carousel
+                                width={theme.width}
+                                data={item.images}
+                                renderItem={({item, index}) => {
+                                    return (
+                                        <Background
+                                            source={{uri: item.image}}
+                                            key={index}
+                                        />
+                                    );
+                                }}
+                            />
+                        </ContentImage>
+                        <Content>
+                            <Header>
+                                <TextNormal>
+                                    <Bold>{item.name}</Bold>
+                                </TextNormal>
+                                <TextSmall>{item.address}</TextSmall>
+                            </Header>
+                            <Footer>
+                                <FlexBox>
                                     <FontAwesomeIcon
-                                        icon={faArrowDown}
-                                        size={20}
-                                        color="white"
+                                        icon={faClock}
+                                        size={12}
+                                        color={theme.colors.darkGray}
                                     />
-                                </ArrowContainer>
-                            </Button>
-                        </Footer>
-                    </Content>
-                </ItemContainer>
-            ))}
+                                    <TextSmall>{item.time}</TextSmall>
+                                </FlexBox>
+                                <FlexBox>
+                                    <FontAwesomeIcon
+                                        icon={faPhoneVolume}
+                                        size={12}
+                                        color={theme.colors.darkGray}
+                                    />
+                                    <TextSmall>{item.contact}</TextSmall>
+                                </FlexBox>
+                                <FlexBox>
+                                    <FontAwesomeIcon
+                                        icon={faClock}
+                                        size={12}
+                                        color={theme.colors.darkGray}
+                                    />
+                                    <TextSmall>
+                                        {item.information.join(' · ')}
+                                    </TextSmall>
+                                </FlexBox>
+                                <Button
+                                    backgroundColor={theme.colors.green}
+                                    onPress={() => {
+                                        setModalVisible(true);
+                                    }}>
+                                    <FlexGrow>
+                                        <TextTiny color={theme.colors.white}>
+                                            쿠폰 다운받기
+                                        </TextTiny>
+                                    </FlexGrow>
+                                    <ArrowContainer>
+                                        <FontAwesomeIcon
+                                            icon={faArrowDown}
+                                            size={20}
+                                            color="white"
+                                        />
+                                    </ArrowContainer>
+                                </Button>
+                            </Footer>
+                        </Content>
+                        <CouponModal
+                            open={isModalVisible}
+                            close={() => {
+                                setModalVisible(false);
+                            }}
+                            data={item.coupon}
+                        />
+                    </ItemContainer>
+                ))
+            ) : (
+                <View />
+            )}
         </Container>
     );
 }

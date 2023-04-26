@@ -1,36 +1,36 @@
-import ImageView from '@/atoms/ImageView/ImageView';
 import TileContainer from '@/atoms/containers/TileContainer';
 import breakWords from '@/lib/breakWords';
 import GlobalStyle from '@/style/global';
-import {faAngleRight, faArrowRight} from '@fortawesome/free-solid-svg-icons';
+import {faAngleRight} from '@fortawesome/free-solid-svg-icons';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
-import {useNavigation} from '@react-navigation/native';
-import {
-    Button,
-    FlatList,
-    Image,
-    ImageBackground,
-    ScrollView,
-    Text,
-    View,
-} from 'react-native';
+import {FlatList, ImageBackground, Text, View} from 'react-native';
 import {TouchableOpacity} from 'react-native-gesture-handler';
 import tailwind from 'twrnc';
+import {useEffect, useState} from 'react';
+import api from '@/api/axios';
+import BoxPaddingX from '@/atoms/containers/BoxPaddingX';
+import BoxPaddingY from '@/atoms/containers/BoxPaddingY';
+import Gap from '@/atoms/containers/Gap';
+import {theme} from '@/style/theme';
 
-const data = [
-    {
-        subText: '당일손질 쫀득쫀득',
-        title: '울릉도 자연산 특물회',
-        option: '특물회 주문 시',
-        service: '맥주 1병 무료',
-        image: require('@assets/img/food.png'),
-        bgGradientStart: '#f9f882',
-        bgGradientEnd: '#fff',
-    },
-];
+export default function TileList(props: any) {
+    const navigation = props.navigation;
+    const [category, setCategory] = useState<any>({});
+    const [data, setData] = useState<any>([]);
+    const [right, setRight] = useState<any>([]);
 
-export default function TileList() {
-    const navigation = useNavigation<{[key: string]: any}>();
+    useEffect(() => {
+        console.log(props);
+        api.get(`/category/${props.route.params.id}`).then(res => {
+            if (res.data) {
+                setCategory(res.data);
+                const half = Math.ceil(res.data.items.length / 2);
+                setData(res.data.items.slice(0, half));
+                setRight(res.data.items.slice(half));
+            }
+        });
+    }, [props.params]);
+
     return (
         <View style={tailwind`flex h-full flex-row px-4 gap-2`}>
             <FlatList
@@ -39,12 +39,14 @@ export default function TileList() {
                 showsVerticalScrollIndicator={false}
                 data={data}
                 renderItem={({item, index}) => {
+                    const {color}: {color: string} = item;
                     return (
                         <TileContainer
-                            gradient={[
-                                item.bgGradientStart,
-                                item.bgGradientEnd,
-                            ]}
+                            gradient={
+                                color && color.split(',').length === 2
+                                    ? color.split(',')
+                                    : [color, color]
+                            }
                             height={index % 3 === 0 ? '300px' : '280px'}
                             // style={{
                             //     ...tailwind`flex-row flex flex-col gap-2 rounded-lg p-4 w-full ${
@@ -52,83 +54,91 @@ export default function TileList() {
                             //     }`,
                             // }}
                         >
-                            <View style={{flex: 1}}>
-                                <Text style={GlobalStyle.textLight}>
-                                    {item.subText}
-                                </Text>
-                                <Text
-                                    style={GlobalStyle.title}
-                                    lineBreakMode="head">
-                                    {breakWords(item.title, 6)}
-                                </Text>
-                            </View>
-                            <View style={{flex: 1}}>
-                                <Text
-                                    style={{
-                                        ...GlobalStyle.textTiny,
-                                        ...{
-                                            textDecorationStyle: 'solid',
-                                            textDecorationLine: 'underline',
-                                        },
-                                    }}>
-                                    {item.option}
-                                    {'\n'}
-                                    {item.service}
-                                </Text>
-                            </View>
                             <ImageBackground
-                                source={item.image}
+                                source={{
+                                    uri: item.information.slice(4).join(),
+                                }}
                                 style={{
                                     width: '100%',
-                                    height: 120,
+                                    height: '100%',
                                     position: 'absolute',
                                     bottom: 0,
                                 }}
+                                resizeMode="contain"
                             />
-                            <View
-                                style={{
-                                    display: 'flex',
-                                    justifyContent: 'flex-end',
-                                    alignItems: 'center',
-                                    flexDirection: 'row',
-                                    width: '100%',
-                                }}>
-                                <TouchableOpacity
-                                    onPress={() => {
-                                        navigation.navigate('Item', {
-                                            datailType: 'wave',
-                                        });
-                                    }}>
+                            <BoxPaddingX>
+                                <BoxPaddingY>
+                                    <BoxPaddingY>
+                                        <Text style={GlobalStyle.textLight}>
+                                            {item.information[0]}
+                                        </Text>
+                                        <Text
+                                            style={GlobalStyle.title}
+                                            lineBreakMode="head">
+                                            {breakWords(item.information[1], 6)}
+                                        </Text>
+                                    </BoxPaddingY>
+
+                                    <Text
+                                        style={{
+                                            ...GlobalStyle.textTiny,
+                                            ...{
+                                                textDecorationStyle: 'solid',
+                                                textDecorationLine: 'underline',
+                                            },
+                                        }}>
+                                        {item.information[2]}
+                                        {'\n'}
+                                        {item.information[3]}
+                                    </Text>
+                                    <Gap size={theme.scale.width(55)} />
                                     <View
                                         style={{
                                             display: 'flex',
-                                            flexDirection: 'row',
-                                            justifyContent: 'center',
+                                            justifyContent: 'flex-end',
                                             alignItems: 'center',
-                                            backgroundColor:
-                                                'rgba(255,255,255,0.9)',
-                                            padding: 2,
-                                            paddingRight: 4,
-                                            paddingLeft: 4,
-                                            borderRadius: 10,
+                                            flexDirection: 'row',
+                                            width: '100%',
                                         }}>
-                                        <Text
-                                            style={{
-                                                ...GlobalStyle.textTiny,
-                                                ...{
-                                                    position: 'relative',
-                                                    zIndex: 999,
-                                                },
+                                        <TouchableOpacity
+                                            onPress={() => {
+                                                navigation.push('WaveDetail', {
+                                                    id: item.id,
+                                                });
                                             }}>
-                                            할인 혜택 보러가기
-                                        </Text>
-                                        <FontAwesomeIcon
-                                            icon={faAngleRight}
-                                            size={12}
-                                        />
+                                            <View
+                                                style={{
+                                                    display: 'flex',
+                                                    flexDirection: 'row',
+                                                    justifyContent: 'center',
+                                                    alignItems: 'center',
+                                                    backgroundColor:
+                                                        'rgba(255,255,255,0.9)',
+                                                    padding: 2,
+                                                    paddingRight: 4,
+                                                    paddingLeft: 4,
+                                                    borderRadius: 10,
+                                                }}>
+                                                <Text
+                                                    style={{
+                                                        ...GlobalStyle.textTiny,
+                                                        ...{
+                                                            position:
+                                                                'relative',
+                                                            zIndex: 999,
+                                                        },
+                                                    }}>
+                                                    할인 혜택 보러가기
+                                                </Text>
+                                                <FontAwesomeIcon
+                                                    icon={faAngleRight}
+                                                    size={12}
+                                                />
+                                            </View>
+                                        </TouchableOpacity>
                                     </View>
-                                </TouchableOpacity>
-                            </View>
+                                </BoxPaddingY>
+                            </BoxPaddingX>
                         </TileContainer>
                     );
                 }}
@@ -138,93 +148,108 @@ export default function TileList() {
                 style={tailwind`flex-1 flex w-full flex-col`}
                 ItemSeparatorComponent={() => <View style={tailwind`h-2`} />}
                 showsVerticalScrollIndicator={false}
-                data={data}
+                data={right}
                 renderItem={({item, index}) => {
+                    const {color}: {color: string} = item;
                     return (
                         <TileContainer
-                            gradient={[
-                                item.bgGradientStart,
-                                item.bgGradientEnd,
-                            ]}
-                            height={index % 3 === 0 ? '270px' : '300px'}
+                            gradient={
+                                color && color.split(',').length === 2
+                                    ? color.split(',')
+                                    : [color, color]
+                            }
+                            height={index % 3 === 0 ? '280px' : '300px'}
                             // style={{
                             //     ...tailwind`flex-row flex flex-col gap-2 rounded-lg p-4 w-full ${
                             //         index % 3 === 0 ? 'h-72' : 'h-64'
                             //     }`,
                             // }}
                         >
-                            <View style={{flex: 1}}>
-                                <Text style={GlobalStyle.textLight}>
-                                    {item.subText}
-                                </Text>
-                                <Text
-                                    style={GlobalStyle.title}
-                                    lineBreakMode="head">
-                                    {breakWords(item.title, 8)}
-                                </Text>
-                            </View>
-                            <View style={{flex: 1}}>
-                                <Text
-                                    style={{
-                                        ...GlobalStyle.textTiny,
-                                        ...{
-                                            textDecorationStyle: 'solid',
-                                            textDecorationLine: 'underline',
-                                        },
-                                    }}>
-                                    {item.option}
-                                    {'\n'}
-                                    {item.service}
-                                </Text>
-                            </View>
                             <ImageBackground
-                                source={item.image}
+                                source={{
+                                    uri: item.information.slice(4).join(),
+                                }}
                                 style={{
                                     width: '100%',
-                                    height: 120,
+                                    height: '100%',
                                     position: 'absolute',
                                     bottom: 0,
                                 }}
+                                resizeMode="contain"
                             />
-                            <View
-                                style={{
-                                    display: 'flex',
-                                    justifyContent: 'flex-end',
-                                    alignItems: 'center',
-                                    flexDirection: 'row',
-                                    width: '100%',
-                                }}>
-                                <TouchableOpacity>
+                            <BoxPaddingX>
+                                <BoxPaddingY>
+                                    <BoxPaddingY>
+                                        <Text style={GlobalStyle.textLight}>
+                                            {item.information[0]}
+                                        </Text>
+                                        <Text
+                                            style={GlobalStyle.title}
+                                            lineBreakMode="head">
+                                            {breakWords(item.information[1], 6)}
+                                        </Text>
+                                    </BoxPaddingY>
+
+                                    <Text
+                                        style={{
+                                            ...GlobalStyle.textTiny,
+                                            ...{
+                                                textDecorationStyle: 'solid',
+                                                textDecorationLine: 'underline',
+                                            },
+                                        }}>
+                                        {item.information[2]}
+                                        {'\n'}
+                                        {item.information[3]}
+                                    </Text>
+                                    <Gap size={theme.scale.width(55)} />
                                     <View
                                         style={{
                                             display: 'flex',
-                                            flexDirection: 'row',
-                                            justifyContent: 'center',
+                                            justifyContent: 'flex-end',
                                             alignItems: 'center',
-                                            backgroundColor:
-                                                'rgba(255,255,255,0.9)',
-                                            padding: 2,
-                                            paddingRight: 4,
-                                            paddingLeft: 4,
-                                            borderRadius: 10,
+                                            flexDirection: 'row',
+                                            width: '100%',
                                         }}>
-                                        <Text
-                                            style={{
-                                                ...GlobalStyle.textTiny,
-                                                ...{
-                                                    position: 'relative',
-                                                    zIndex: 999,
-                                                },
+                                        <TouchableOpacity
+                                            onPress={() => {
+                                                navigation.push('WaveDetail', {
+                                                    id: item.id,
+                                                });
                                             }}>
-                                            할인 혜택 보러가기
-                                        </Text>
-                                        <FontAwesomeIcon
-                                            icon={faAngleRight}
-                                            size={12}
-                                        />
+                                            <View
+                                                style={{
+                                                    display: 'flex',
+                                                    flexDirection: 'row',
+                                                    justifyContent: 'center',
+                                                    alignItems: 'center',
+                                                    backgroundColor:
+                                                        'rgba(255,255,255,0.9)',
+                                                    padding: 2,
+                                                    paddingRight: 4,
+                                                    paddingLeft: 4,
+                                                    borderRadius: 10,
+                                                }}>
+                                                <Text
+                                                    style={{
+                                                        ...GlobalStyle.textTiny,
+                                                        ...{
+                                                            position:
+                                                                'relative',
+                                                            zIndex: 999,
+                                                        },
+                                                    }}>
+                                                    할인 혜택 보러가기
+                                                </Text>
+                                                <FontAwesomeIcon
+                                                    icon={faAngleRight}
+                                                    size={12}
+                                                />
+                                            </View>
+                                        </TouchableOpacity>
                                     </View>
-                                </TouchableOpacity>
-                            </View>
+                                </BoxPaddingY>
+                            </BoxPaddingX>
                         </TileContainer>
                     );
                 }}

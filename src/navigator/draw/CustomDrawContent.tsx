@@ -1,121 +1,71 @@
-import FlexBox from '@/atoms/containers/FlexBox';
-import {Text14} from '@/atoms/text';
 import {
     DrawerContentComponentProps,
     DrawerContentScrollView,
 } from '@react-navigation/drawer';
 
-import {View} from 'react-native';
+import {FlatList, View} from 'react-native';
 import styled from 'styled-components/native';
+import FlexBox from '@/atoms/containers/FlexBox';
+import {Text14} from '@/atoms/text';
+import {useCategory} from '@/lib/context/CategoryContext';
+import {useEffect} from 'react';
 
 function CustomDrawerContent(props: DrawerContentComponentProps) {
-    return (
-        <DrawerContentScrollView {...props}>
-            <View>
-                <LoginContainer>
-                    <LoginButton>
-                        <Text14 color="white">로그인하기</Text14>
-                    </LoginButton>
-                </LoginContainer>
-                <ItemContainer>
-                    <Item
-                        onPress={() => {
-                            props.navigation.navigate('Category', {
-                                title: '관광명소',
-                                category: '',
-                                transparent: true,
-                            });
-                        }}>
-                        <FlexBox>
-                            <IconContainer>
-                                <Icon
-                                    source={require('@assets/icon/attraction.png')}
-                                />
-                            </IconContainer>
-                            <Text14>관광명소</Text14>
-                        </FlexBox>
-                    </Item>
-                    <Item
-                        onPress={() => {
-                            props.navigation.navigate('Category', {
-                                category: '',
-                                title: '기념품',
-                            });
-                        }}>
-                        <FlexBox>
-                            <IconContainer>
-                                <Icon
-                                    source={require('@assets/icon/gifts.png')}
-                                />
-                            </IconContainer>
-                            <Text14>기념품</Text14>
-                        </FlexBox>
-                    </Item>
-                    <Item
-                        onPress={() => {
-                            props.navigation.navigate('Category', {
-                                category: '',
-                                title: '카페·먹거리',
-                            });
-                        }}>
-                        <FlexBox>
-                            <IconContainer>
-                                <Icon
-                                    source={require('@assets/icon/cafe.png')}
-                                />
-                            </IconContainer>
-                            <Text14>카페·먹거리</Text14>
-                        </FlexBox>
-                    </Item>
-                    <Item
-                        onPress={() => {
-                            props.navigation.navigate('Category', {
-                                category: 'no-header',
-                                title: '숙소',
-                            });
-                        }}>
-                        <FlexBox>
-                            <IconContainer>
-                                <Icon
-                                    source={require('@assets/icon/hotel.png')}
-                                />
-                            </IconContainer>
-                            <Text14>숙소</Text14>
-                        </FlexBox>
-                    </Item>
-                    <Item
-                        onPress={() => {
-                            props.navigation.navigate('Category', {
-                                category: 'tile',
-                                title: '안주거리',
-                            });
-                        }}>
-                        <FlexBox>
-                            <IconContainer>
-                                <Icon
-                                    source={require('@assets/icon/drink.png')}
-                                />
-                            </IconContainer>
-                            <Text14>안주거리</Text14>
-                        </FlexBox>
-                    </Item>
+    const {categories} = useCategory();
+    const navigation = props.navigation;
 
-                    <Item
-                        onPress={() => {
-                            props.navigation.navigate('Category', {
-                                category: 'tile',
-                                title: '식당',
-                            });
-                        }}>
-                        <FlexBox>
-                            <IconContainer>
-                                <Icon
-                                    source={require('@assets/icon/food.png')}
-                                />
-                            </IconContainer>
-                            <Text14>맛집</Text14>
-                        </FlexBox>
-                    </Item>
+    const icon = (name: string) => {
+        switch (name) {
+            case '관광명소':
+                return require('@assets/icon/attraction.png');
+            case '기념품':
+                return require('@assets/icon/gifts.png');
+            case '카페·먹거리':
+                return require('@assets/icon/cafe.png');
+            case '숙소':
+                return require('@assets/icon/hotel.png');
+            case '안주거리':
+                return require('@assets/icon/drink.png');
+            case '맛집':
+                return require('@assets/icon/food.png');
+            default:
+                return require('@assets/icon/attraction.png');
+        }
+    };
+
+    useEffect(() => {
+        console.log('CustomDrawerContent', categories);
+    });
+
+    return (
+        <DrawerContentScrollView {...props} scrollEnabled={false}>
+            <View>
+                <ItemContainer>
+                    <FlatList
+                        data={categories}
+                        scrollEnabled={false}
+                        renderItem={({item}) => {
+                            const {name, type, transparent, id} = item;
+                            return (
+                                <Item
+                                    onPress={() => {
+                                        navigation.navigate('Category', {
+                                            title: name,
+                                            category: type,
+                                            transparent: transparent,
+                                            id: id,
+                                        });
+                                    }}>
+                                    <FlexBox>
+                                        <IconContainer>
+                                            <Icon source={icon(name)} />
+                                        </IconContainer>
+                                        <Text14>{name}</Text14>
+                                    </FlexBox>
+                                </Item>
+                            );
+                        }}
+                    />
                 </ItemContainer>
             </View>
         </DrawerContentScrollView>

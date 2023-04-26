@@ -1,6 +1,6 @@
 import CategoryScreen from '@/screens/Category/CategoryScreen';
 import HomeScreen from '@/screens/Home/HomeScreen';
-import {createStackNavigator} from '@react-navigation/stack';
+import {createStackNavigator, StackHeaderProps} from '@react-navigation/stack';
 import React from 'react';
 import CustomStackHeader from './header/CustomStackHeader';
 import {getHeaderTitle} from '@react-navigation/elements';
@@ -10,10 +10,12 @@ import ReviewScreen from '@/screens/Review/ReviewScreen';
 import DetailScreen from '@/screens/Detail/DetailScreen';
 import {SafeAreaView, StatusBar} from 'react-native';
 import ListScreen from '@/screens/List/ListScreen';
+import CafeDetail from '@/screens/Detail/CafeDetail';
+import WaveDetailScreen from '@/screens/Detail/WaveDetailScreen';
 
-const Stack = createStackNavigator();
+export const Stack = createStackNavigator();
 
-export default function HomeStack() {
+export default function HomeStack(props: any) {
     return (
         <Stack.Navigator
             initialRouteName="Home"
@@ -22,7 +24,7 @@ export default function HomeStack() {
                 headerStyle: {
                     ...tailwind`h-8`,
                 },
-                header: props => {
+                header: (props: StackHeaderProps) => {
                     const title: string = getHeaderTitle(
                         props.options,
                         props.route.name,
@@ -47,8 +49,10 @@ export default function HomeStack() {
             <Stack.Screen name="Category" component={CategoryScreen} />
             <Stack.Screen name="Item" component={ItemScreen} />
             <Stack.Screen name="Review" component={ReviewScreen} />
-            <Stack.Screen name="Detail" component={DetailScreen} />
             <Stack.Screen name="List" component={ListScreen} />
+            <Stack.Screen name="Detail" component={DetailScreen} />
+            <Stack.Screen name="CafeDetail" component={CafeDetail} />
+            <Stack.Screen name="WaveDetail" component={WaveDetailScreen} />
         </Stack.Navigator>
     );
 }

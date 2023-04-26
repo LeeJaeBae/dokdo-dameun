@@ -5,6 +5,6 @@ export default function DetailScreen(props: any) {
     const {detailType} = props.route.params;
     const detail = useMemo(() => {
         return <AttractionDetail {...props} transparent={false} />;
-    }, [detailType]);
+    }, [props.route]);
     return <>{detail}</>;
 }

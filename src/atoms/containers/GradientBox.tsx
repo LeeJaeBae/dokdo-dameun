@@ -21,4 +21,6 @@ export default styled(LinearGradient).attrs((props: TileContainerProps) => ({
     border: 1px solid
         ${(props: TileContainerProps) => props.theme.colors.background};
     background-filter: opacity(0.5);
+    margin-bottom: ${(props: TileContainerProps) =>
+        props.theme.scale.width(10)}px;
 `;

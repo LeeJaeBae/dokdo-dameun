@@ -56,7 +56,10 @@ const WaveComponent = styled.View<{
 }>`
     background-color: ${(props: any) => props.color || 'white'};
     border-bottom-right-radius: 0px;
-    height: ${props => props.theme.scale.height(145)}px;
+    height: ${props =>
+        props.positionState === 'bottom'
+            ? props.theme.scale.width(400)
+            : props.theme.scale.width(300)}px;
     overflow: hidden;
     ${(props: any) =>
         props.positionState === 'top' || props.positionState === undefined

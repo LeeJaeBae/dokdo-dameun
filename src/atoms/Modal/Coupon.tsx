@@ -1,4 +1,5 @@
 import styled from 'styled-components/native';
+import {useMemo} from 'react';
 
 const CouponModal = ({
     open,
@@ -9,7 +10,23 @@ const CouponModal = ({
     close: () => void;
     data?: any;
 }) => {
-    return (
+    const source = useMemo(() => {
+        if (data && data.color) {
+            switch (data.color) {
+                case 'blue':
+                    return require('@assets/coupon/blue_coupon.png');
+                case 'green':
+                    return require('@assets/coupon/green_coupon.png');
+                case 'purple':
+                    return require('@assets/coupon/purple_coupon.png');
+                case 'black':
+                    return require('@assets/coupon/black_coupon.png');
+            }
+        } else {
+            return require('@assets/coupon/blue_coupon.png');
+        }
+    }, [data]);
+    return data ? (
         <ModalStyled
             statusBarTranslucent={true}
             animationType="slide"
@@ -18,7 +35,7 @@ const CouponModal = ({
             onRequestClose={close}>
             <Container onTouchEnd={close}>
                 <CouponBackground>
-                    <CouponContainer resizeMode="contain" source={data.image}>
+                    <CouponContainer resizeMode="contain" source={source}>
                         <InfoContainer>
                             <InfoTitleContainer>
                                 <CouponText>{data.title}</CouponText>
@@ -36,6 +53,8 @@ const CouponModal = ({
                 </CouponBackground>
             </Container>
         </ModalStyled>
+    ) : (
+        <></>
     );
 };
 

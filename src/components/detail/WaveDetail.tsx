@@ -13,7 +13,6 @@ import TextInformation from '@/atoms/text/TextInformation';
 import TextLarge from '@/atoms/text/TextLarge';
 import TextSmall from '@/atoms/text/TextSmall';
 import Underline from '@/atoms/text/Underline';
-import breakWords from '@/lib/breakWords';
 import {theme} from '@/style/theme';
 import {faClock} from '@fortawesome/free-regular-svg-icons';
 import {
@@ -22,26 +21,44 @@ import {
     faPhoneVolume,
 } from '@fortawesome/free-solid-svg-icons';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
-import {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {Dimensions, Image, ImageBackground, View} from 'react-native';
 import Carousel from 'react-native-reanimated-carousel';
 import tailwind from 'twrnc';
+import api from '@/api/axios';
 
-export default function WaveDetail() {
+export default function WaveDetail(props: any) {
     const [open, setOpen] = useState(false);
     const width = Dimensions.get('window').width;
-    return (
+    const {navigation} = props;
+    const [category, setCategory] = useState<any>({});
+    const [data, setData] = useState<any>([]);
+    const [tags, setTags] = useState<string[]>([]);
+
+    useEffect(() => {
+        api.get(`/item/${props.route.params.id}`).then(res => {
+            if (res.data) {
+                setCategory(res.data);
+
+                setData(res.data);
+
+                setTags(res.data.tags.split('/'));
+            }
+        });
+    }, [props.route]);
+
+    return data ? (
         <CScrollView>
             <WaveViewTop color="#4C2A6A" bgc="#fff">
                 <Box height="330px">
-                    <Carousel
+                    <Carousel<any>
                         width={width}
-                        height={330}
-                        data={[
-                            require('@assets/banner.png'),
-                            require('@assets/banner1.png'),
-                            require('@assets/banner2.png'),
-                        ]}
+                        height={theme.scale.width(240)}
+                        data={
+                            data.images && data.images.length > 0
+                                ? data.images
+                                : []
+                        }
                         scrollAnimationDuration={1000}
                         renderItem={({item, index}) => (
                             <View key={index} style={tailwind`h-full`}>
@@ -54,11 +71,17 @@ export default function WaveDetail() {
                         )}
                     />
                 </Box>
-                <Box alignItems="center" height="70px">
+                <View
+                    style={{
+                        width: '100%',
+                        position: 'absolute',
+                        bottom: 18,
+                        left: 10,
+                    }}>
                     <TextSmall color={'#fff'} style={{marginLeft: 10}}>
-                        여행객들이 극찬하는 맛집
+                        {data.description}
                     </TextSmall>
-                </Box>
+                </View>
             </WaveViewTop>
             <BoxPaddingX
                 style={{
@@ -76,12 +99,15 @@ export default function WaveDetail() {
                         justifyContent: 'space-between',
                     }}>
                     <View>
-                        <TextLarge color={'primary'}>신비섬횟집</TextLarge>
+                        <TextLarge color={'primary'}>{data.title}</TextLarge>
                         <TextSmall>
-                            <Bold>꽁치물회와 전복죽이 유명한 맛집!</Bold>
+                            <Bold>{data.subtitle}</Bold>
                         </TextSmall>
                     </View>
-                    <View>
+                    <View
+                        style={{
+                            flexGrow: 1,
+                        }}>
                         <CouponeBtn
                             onPress={() => {
                                 setOpen(true);
@@ -99,9 +125,7 @@ export default function WaveDetail() {
                             icon={faLocationDot}
                             color={theme.colors.primary}
                         />
-                        <TextSmall>
-                            경상북도 울릉군 울릉읍 울릉순환로 592 신비섬횟집
-                        </TextSmall>
+                        <TextSmall>{data.address}</TextSmall>
                     </FlexBox>
                     <FlexBox>
                         <FontAwesomeIcon
@@ -109,7 +133,7 @@ export default function WaveDetail() {
                             color={theme.colors.primary}
                         />
                         <TextSmall>
-                            <Bold>영업전</Bold> 매일 11:00 ~ 21:00
+                            <Bold>영업전</Bold> 매일 {data.time}
                         </TextSmall>
                     </FlexBox>
                     <FlexBox>
@@ -118,7 +142,7 @@ export default function WaveDetail() {
                             color={theme.colors.primary}
                         />
                         <TextSmall>
-                            054-791-4460 <Bold>전화걸기</Bold>
+                            {data.contact} <Bold>전화걸기</Bold>
                         </TextSmall>
                     </FlexBox>
                     <FlexBox>
@@ -126,53 +150,57 @@ export default function WaveDetail() {
                             icon={faInfoCircle}
                             color={theme.colors.primary}
                         />
-                        <TextSmall>
-                            매장 내 식사 · 테이크아웃 · 배달불가능
-                        </TextSmall>
+                        <TextSmall>{tags[0]}</TextSmall>
                     </FlexBox>
                 </View>
             </BoxPaddingX>
-            <WaveViewBottom color="#fff" bgc="#4C2A6A">
-                <BoxPaddingX>
-                    <BoxPaddingY style={{paddingTop: 40, gap: 15}}>
-                        <TextLarge color={'#fff'}>
-                            <Medium>신선한 해산물과</Medium>
-                        </TextLarge>
-                        <TextLarge color={'#fff'}>
-                            비법 육수로 만든 {'\n'}시원한 물회
-                        </TextLarge>
-                        <TextInformation color={'#fff'}>
-                            <Underline>
-                                특물회 주문시 {'\n'}맥주 1병 무료제공
-                            </Underline>
+            {props.route.params.noBottom ? null : (
+                <>
+                    <WaveViewBottom color="#fff" bgc="#4C2A6A">
+                        <BoxPaddingX>
+                            <BoxPaddingY style={{paddingTop: 40, gap: 15}}>
+                                <TextLarge color={'#fff'}>
+                                    <Medium>{tags[1]}</Medium>
+                                </TextLarge>
+                                <TextLarge color={'#fff'}>{tags[2]}</TextLarge>
+                                <TextInformation color={'#fff'}>
+                                    <Underline>{tags[3]}</Underline>
+                                </TextInformation>
+                            </BoxPaddingY>
+                        </BoxPaddingX>
+                        <ImageBackground
+                            style={{
+                                width: '100%',
+                                height: '100%',
+                                position: 'absolute',
+                                zIndex: -1,
+                            }}
+                            source={require('@assets/img/food.png')}
+                            resizeMode="cover"
+                        />
+                    </WaveViewBottom>
+                    <FlexCenter height={110}>
+                        <TextInformation>
+                            {
+                                '현지 상황(날씨,인원 등)에 따라 할인 및 서비스 내용이 변동될 수 있으며 매장에서 안내 받으시길 바랍니다.'
+                            }
+                            <Bold> 중복 사용 가능</Bold>
                         </TextInformation>
-                    </BoxPaddingY>
-                </BoxPaddingX>
-                <ImageBackground
-                    style={{
-                        width: '100%',
-                        height: '100%',
-                        position: 'absolute',
-                        zIndex: -1,
-                    }}
-                    source={require('@assets/img/food.png')}
-                    resizeMode="cover"
-                />
-            </WaveViewBottom>
-            <FlexCenter height={120}>
-                <TextInformation>
-                    {
-                        '현지 상황(날씨,인원 등)에 따라 할인 및 서비스 내용이 변동될 수 있으며 매장에서 안내 받으시길 바랍니다.'
-                    }
-                    <Bold> 중복 사용 가능</Bold>
-                </TextInformation>
-            </FlexCenter>
+                    </FlexCenter>
+                </>
+            )}
+
             <CouponModal
                 open={open}
                 close={() => {
                     setOpen(false);
                 }}
+                data={data.coupon}
             />
         </CScrollView>
+    ) : (
+        <View>
+            <TextLarge>로딩중</TextLarge>
+        </View>
     );
 }

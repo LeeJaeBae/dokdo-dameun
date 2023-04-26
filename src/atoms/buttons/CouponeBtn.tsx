@@ -17,10 +17,8 @@ export default function CouponeBtn({onPress}: {onPress: () => void}) {
 }
 
 const CouponeBtnContainer = styled(TouchableOpacity)`
-    width: ${(props: {theme: {scale: {width: (arg0: number) => any}}}) =>
-        props.theme.scale.width(1)}px};
-    height: ${(props: {theme: {scale: {height: (arg0: number) => any}}}) =>
-        props.theme.scale.height(14)}px;
+    width: ${({theme}: any) => theme.scale.width(120)}px;
+    height: ${({theme}: any) => theme.scale.width(40)}px;
     border-radius: 5px;
     background-color: ${(props: {theme: {colors: {primary: any}}}) =>
         props.theme.colors.primary};
@@ -28,6 +26,8 @@ const CouponeBtnContainer = styled(TouchableOpacity)`
     justify-content: center;
     flex-direction: row;
     overflow: hidden;
+    position: absolute;
+    right: 0px;
 `;
 
 const LeftContainer = styled.View`

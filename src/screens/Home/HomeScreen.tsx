@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useMemo} from 'react';
 import {
     Dimensions,
     FlatList,
@@ -15,6 +15,7 @@ import {faBars} from '@fortawesome/free-solid-svg-icons';
 import Carousel from 'react-native-reanimated-carousel';
 import styled from 'styled-components/native';
 import {theme} from '@/style/theme';
+import {useCategory} from '@/lib/context/CategoryContext';
 
 const LogoImage = styled.ImageBackground`
     height: 50px;
@@ -24,6 +25,34 @@ const LogoImage = styled.ImageBackground`
 export default function HomeScreen(props: any) {
     const {navigation} = props;
     const width = Dimensions.get('window').width;
+    const {categories} = useCategory();
+    // const [categories, setCategories] = useState<any[]>([]);
+    //
+    // useEffect(() => {
+    //     api.get('categories').then(res => {
+    //         setCategories(res.data);
+    //     });
+    // }, []);
+
+    const icon = useMemo(
+        () => (name: string) => {
+            switch (name) {
+                case '관광명소':
+                    return require('@assets/icon/attraction.png');
+                case '기념품':
+                    return require('@assets/icon/gifts.png');
+                case '카페·먹거리':
+                    return require('@assets/icon/cafe.png');
+                case '숙소':
+                    return require('@assets/icon/hotel.png');
+                case '안주거리':
+                    return require('@assets/icon/drink.png');
+                case '맛집':
+                    return require('@assets/icon/food.png');
+            }
+        },
+        [categories],
+    );
 
     return (
         <ScrollView
@@ -83,71 +112,86 @@ export default function HomeScreen(props: any) {
             </View>
             <ListContainer>
                 <IconsContainer
-                    data={[
-                        {
-                            title: '관광명소',
-                            image: require('@assets/icon/attraction.png'),
-                            onPress: () => {
-                                navigation.navigate('Category', {
-                                    title: '관광명소',
-                                    category: '',
-                                    transparent: true,
-                                });
-                            },
-                        },
-                        {
-                            title: '기념품',
-                            image: require('@assets/icon/gifts.png'),
-                            onPress: () => {
-                                navigation.navigate('Category', {
-                                    title: '기념품',
-                                    category: '',
-                                    transparent: true,
-                                });
-                            },
-                        },
-                        {
-                            title: '카페·먹거리',
-                            image: require('@assets/icon/cafe.png'),
-                            onPress: () => {
-                                navigation.navigate('Category', {
-                                    title: '카페·먹거리',
-                                    category: 'cafe',
-                                    transparent: true,
-                                });
-                            },
-                        },
-                        {
-                            title: '숙소',
-                            image: require('@assets/icon/hotel.png'),
-                            onPress: () => {
-                                navigation.navigate('Category', {
-                                    title: '숙소',
-                                    category: 'no-header',
-                                });
-                            },
-                        },
-                        {
-                            title: '안주거리',
-                            image: require('@assets/icon/drink.png'),
-                            onPress: () => {
-                                navigation.navigate('Category', {
-                                    title: '안주거리',
-                                    category: 'tile',
-                                });
-                            },
-                        },
-                        {
-                            title: '맛집',
-                            image: require('@assets/icon/food.png'),
-                            onPress: () => {
-                                navigation.navigate('Category', {
-                                    title: '맛집',
-                                    category: 'tile',
-                                });
-                            },
-                        },
-                    ]}
+                    data={
+                        categories
+                            ? categories.map(category => ({
+                                  title: category.name,
+                                  image: icon(category.name),
+                                  onPress: () => {
+                                      navigation.push('Category', {
+                                          title: category.name,
+                                          category: category.type,
+                                          transparent: category.transparent,
+                                          id: category.id,
+                                      });
+                                  },
+                              }))
+                            : [
+                                  {
+                                      title: '관광명소',
+                                      image: require('@assets/icon/attraction.png'),
+                                      onPress: () => {
+                                          navigation.navigate('Category', {
+                                              title: '관광명소',
+                                              category: '',
+                                              transparent: true,
+                                          });
+                                      },
+                                  },
+                                  {
+                                      title: '기념품',
+                                      image: require('@assets/icon/gifts.png'),
+                                      onPress: () => {
+                                          navigation.navigate('Category', {
+                                              title: '기념품',
+                                              category: '',
+                                              transparent: true,
+                                          });
+                                      },
+                                  },
+                                  {
+                                      title: '카페·먹거리',
+                                      image: require('@assets/icon/cafe.png'),
+                                      onPress: () => {
+                                          navigation.navigate('Category', {
+                                              title: '카페·먹거리',
+                                              category: 'cafe',
+                                              transparent: true,
+                                          });
+                                      },
+                                  },
+                                  {
+                                      title: '숙소',
+                                      image: require('@assets/icon/hotel.png'),
+                                      onPress: () => {
+                                          navigation.navigate('Category', {
+                                              title: '숙소',
+                                              category: 'no-header',
+                                          });
+                                      },
+                                  },
+                                  {
+                                      title: '안주거리',
+                                      image: require('@assets/icon/drink.png'),
+                                      onPress: () => {
+                                          navigation.navigate('Category', {
+                                              title: '안주거리',
+                                              category: 'tile',
+                                          });
+                                      },
+                                  },
+                                  {
+                                      title: '맛집',
+                                      image: require('@assets/icon/food.png'),
+                                      onPress: () => {
+                                          navigation.navigate('Category', {
+                                              title: '맛집',
+                                              category: 'tile',
+                                          });
+                                      },
+                                  },
+                              ]
+                    }
                     renderItem={({item, index}: any) => (
                         <IconContainer
                             key={index}

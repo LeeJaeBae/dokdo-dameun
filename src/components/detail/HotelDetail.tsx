@@ -1,5 +1,3 @@
-import BoxPaddingX from '@/atoms/containers/BoxPaddingX';
-import BoxPaddingY from '@/atoms/containers/BoxPaddingY';
 import FlexBox from '@/atoms/containers/FlexBox';
 import FlexColumn from '@/atoms/containers/FlexColumn';
 import Gap from '@/atoms/containers/Gap';
@@ -13,54 +11,56 @@ import TextNormal from '@/atoms/text/TextNormal';
 import TextSize from '@/atoms/text/TextSize';
 import TextSmall from '@/atoms/text/TextSmall';
 import TextTiny from '@/atoms/text/TextTiny';
-import WriteVertical from '@/atoms/text/WriteVertical';
 import WriteVerticalReverse from '@/atoms/text/WriteVerticalReverse';
 import breakWords from '@/lib/breakWords';
 import {theme} from '@/style/theme';
-import {faUser} from '@fortawesome/free-regular-svg-icons';
 
 import {
     faBanSmoking,
     faSquareParking,
-    faWifi,
     faStar,
+    faWifi,
 } from '@fortawesome/free-solid-svg-icons';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
-import {useNavigation} from '@react-navigation/native';
-import {useEffect, useRef, useState} from 'react';
-import {
-    Animated,
-    Dimensions,
-    Platform,
-    ScrollView,
-    Text,
-    TouchableWithoutFeedback,
-    View,
-} from 'react-native';
-import Dots from 'react-native-dots-pagination';
+import {useEffect, useState} from 'react';
+import {Dimensions, TouchableWithoutFeedback, View} from 'react-native';
 import Carousel from 'react-native-reanimated-carousel';
 import {Shadow} from 'react-native-shadow-2';
 import styled from 'styled-components/native';
-import tailwind from 'twrnc';
+import api from '@/api/axios';
 
-export default function HotelDetail() {
+export default function HotelDetail(props: any) {
     const width = Dimensions.get('window').width;
     const [index, setIndex] = useState(0);
-    const navigation = useNavigation<any>();
+    const {navigation} = props;
 
-    return (
+    const [item, setItem] = useState<any>([]);
+
+    useEffect(() => {
+        api.get(`/item/${props.route.params.id}`).then(res => {
+            if (res.data) {
+                setItem(res.data);
+            }
+        });
+    }, []);
+
+    return item ? (
         <Container showsVerticalScrollIndicator={false}>
             <CarouselContainer>
-                <Carousel
+                <Carousel<any>
                     snapEnabled={true}
                     width={width}
                     height={theme.scale.height(100)}
                     defaultIndex={0}
-                    data={[
-                        require('@assets/banner.png'),
-                        require('@assets/banner.png'),
-                        require('@assets/banner.png'),
-                    ]}
+                    data={
+                        item.images && item.images.length > 0
+                            ? item.images
+                            : [
+                                  require('@assets/banner.png'),
+                                  require('@assets/banner.png'),
+                                  require('@assets/banner.png'),
+                              ]
+                    }
                     scrollAnimationDuration={1000}
                     renderItem={({item, index}) => (
                         <ImageItem key={index} source={item} />
@@ -73,28 +73,23 @@ export default function HotelDetail() {
             <TextContainer>
                 <TextLarge>
                     <Bold>
-                        <LSpacing>힐링스테이 코스모스</LSpacing>
+                        <LSpacing>{item.title}</LSpacing>
                     </Bold>
                 </TextLarge>
-                <Text14>경북 울릉군 북면 추산길 88-13</Text14>
+                <Text14>{item.address}</Text14>
             </TextContainer>
             <TextContainer>
-                <TextNormal>FAMILY ROOM (VILLA TERRE)</TextNormal>
-                <TextSmall>
-                    리조트 2층에 위치한 디럭스 패밀리룸이며 분리된 1개의 방과
-                    거실 공간으로 구성되어 있습니다. 객실에서 코끼리 바위와
-                    추산의 뜻이 담긴 송곳산의 마운틴뷰를, 발코니에서는 아름다운
-                    오션뷰를 감상하실 수 있습니다.
-                </TextSmall>
+                <TextNormal>{item.tags && item.tags.split('/')[0]}</TextNormal>
+                <TextSmall>{item.tags && item.tags.split('/')[1]}</TextSmall>
                 <Gap size={5} />
                 <TextSmall color={theme.colors.primary}>
-                    객실크기 : 60㎡
+                    {item.tags && item.tags.split('/')[2]}
                 </TextSmall>
                 <TextSmall color={theme.colors.primary}>
-                    객실구성 : 더블배드 2개
+                    {item.tags && item.tags.split('/')[3]}
                 </TextSmall>
                 <TextSmall color={theme.colors.primary}>
-                    수용인원 : 기준인원 4명 / 최대인원 4명
+                    {item.tags && item.tags.split('/')[4]}
                 </TextSmall>
             </TextContainer>
             <TextContainer>
@@ -105,17 +100,17 @@ export default function HotelDetail() {
                     <TextLarge>
                         <SemiBold>
                             {breakWords(
-                                '힐링스테이 코스모스 패밀리룸 할인 쿠폰',
+                                (item.coupon && item.coupon.title) || '',
                                 10,
                             )}
                         </SemiBold>
                     </TextLarge>
                     <Gap size={5} />
                     <TextSmall>
-                        패밀리룸 현장 결제 시 10,000원 즉시 할인
+                        {item.coupon && item.coupon.description}
                     </TextSmall>
                     <Gap size={5} />
-                    <TextTiny>Healing Stay KOSMOS</TextTiny>
+                    <TextTiny>{item.coupon && item.coupon.subtitle}</TextTiny>
                     <Circle />
                     <Circle right />
                     <CouponText>
@@ -164,7 +159,7 @@ export default function HotelDetail() {
                     <FontAwesomeIcon icon={faStar} />
                     <TextNormal>4.5</TextNormal>
                     <TextNormal>·</TextNormal>
-                    <TextNormal>후기 1,000개</TextNormal>
+                    <TextNormal>후기 {item.reviews.length}개</TextNormal>
                 </FlexBox>
                 <ReviewContainer>
                     {Array(3)
@@ -188,7 +183,7 @@ export default function HotelDetail() {
                         }>
                         <FlexColumn>
                             <Text14>
-                                <SemiBold>+25</SemiBold>
+                                <SemiBold>+{item.reviews.length}</SemiBold>
                             </Text14>
                             <TextSize size={10}>더보기</TextSize>
                         </FlexColumn>
@@ -197,6 +192,10 @@ export default function HotelDetail() {
                 <Gap size={10} />
             </TextContainer>
         </Container>
+    ) : (
+        <View>
+            <TextSmall>로딩중</TextSmall>
+        </View>
     );
 }
 

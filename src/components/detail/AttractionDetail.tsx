@@ -1,18 +1,18 @@
 import CouponModal from '@/atoms/Modal/Coupon';
-import Avatar from '@/atoms/avatar/Avatar';
 import FlexColumn from '@/atoms/containers/FlexColumn';
 import FlexGrow from '@/atoms/containers/FlexGrow';
 import {Text14, TextLarge, TextSmall, TextTiny} from '@/atoms/text';
-import TextSize from '@/atoms/text/TextSize';
 import {theme} from '@/style/theme';
 import {faArrowDown} from '@fortawesome/free-solid-svg-icons';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {useNavigation} from '@react-navigation/native';
 import {useEffect, useState} from 'react';
-import {Dimensions, ImageSourcePropType} from 'react-native';
+import {Dimensions, ImageSourcePropType, View} from 'react-native';
 import {TouchableOpacity} from 'react-native-gesture-handler';
 import Carousel from 'react-native-reanimated-carousel';
 import styled from 'styled-components/native';
+import Gap from '@/atoms/containers/Gap';
+import api from '@/api/axios';
 
 export default function AttractionDetail(props: any) {
     const width = Dimensions.get('window').width;
@@ -31,6 +31,12 @@ export default function AttractionDetail(props: any) {
 
     useEffect(() => {
         setImages(props.route.params.item.images);
+
+        api.get(`/item/${item.id}`).then(res => {
+            if (res.data) {
+                console.log(res.data.coupon);
+            }
+        });
     }, [props.route]);
 
     return (
@@ -40,31 +46,48 @@ export default function AttractionDetail(props: any) {
                     <TextLarge color={theme.colors.jade}>{item.name}</TextLarge>
                     <Text14 color={theme.colors.gray}>{item.address}</Text14>
                 </Title>
+                <Gap size={5} />
                 <TextSmall>{item.description}</TextSmall>
                 <ButtonContainer>
                     <ReviewContainer>
-                        {Array(4)
-                            .fill(0)
-                            .map((_, index) => (
-                                <Avatar
-                                    key={index}
-                                    index={index}
-                                    source={require('@assets/img/dae_pung1.png')}
-                                />
-                            ))}
-                        <TouchableOpacity
-                            onPress={() => {
-                                navigation.navigate('Review');
-                            }}>
-                            <FlexColumn>
-                                <TextSmall color={theme.colors.jade}>
-                                    +{item.reviews.length}
-                                </TextSmall>
-                                <TextSize size={8} color={theme.colors.jade}>
-                                    더보기
-                                </TextSize>
-                            </FlexColumn>
-                        </TouchableOpacity>
+                        {/*{item.reviews ? (*/}
+                        {/*    item.reviews.map((review: any, index: number) => (*/}
+                        {/*        <Avatar*/}
+                        {/*            key={index}*/}
+                        {/*            index={index}*/}
+                        {/*            source={require('@assets/img/dae_pung1.png')}*/}
+                        {/*        />*/}
+                        {/*    ))*/}
+                        {/*) : (*/}
+                        {/*    <View>*/}
+                        {/*        <TextSize size={8} color={theme.colors.jade}>*/}
+                        {/*            리뷰가 없습니다*/}
+                        {/*        </TextSize>*/}
+                        {/*    </View>*/}
+                        {/*)}*/}
+                        {item.reviews && item.reviews.length > 0 ? (
+                            <TouchableOpacity
+                                onPress={() => {
+                                    navigation.push('Review', {
+                                        items: [item],
+                                        title: item.name,
+                                    });
+                                }}>
+                                <FlexColumn>
+                                    {/*<TextSmall color={theme.colors.jade}>*/}
+                                    {/*    +*/}
+                                    {/*    {item.reviews ? item.reviews.length : 0}*/}
+                                    {/*</TextSmall>*/}
+                                    {/*<TextSize*/}
+                                    {/*    size={8}*/}
+                                    {/*    color={theme.colors.jade}>*/}
+                                    {/*    더보기*/}
+                                    {/*</TextSize>*/}
+                                </FlexColumn>
+                            </TouchableOpacity>
+                        ) : (
+                            <View />
+                        )}
                     </ReviewContainer>
                     <Button onPress={handleOpen}>
                         <FlexGrow>
@@ -82,26 +105,56 @@ export default function AttractionDetail(props: any) {
                     </Button>
                 </ButtonContainer>
             </Content>
-            <Carousel<ImageSourcePropType>
-                data={
-                    // database[`${item.key}`][item.index[0]].items[item.index[1]]
-                    //     .images
-                    images
-                }
-                renderItem={({item, index}) => {
-                    return (
-                        <Background
-                            // onLoad={() => {
-                            //
-                            // }}
-                            key={index}
-                            source={item}
-                        />
-                    );
-                }}
-                width={theme.width}
-                height={theme.scale.heightPercent(55)}
-            />
+            {images && images.length > 0 ? (
+                <Carousel<any>
+                    data={
+                        // database[`${item.key}`][item.index[0]].items[item.index[1]]
+                        //     .images
+                        images
+                    }
+                    renderItem={({item, index}) => {
+                        return (
+                            <Background
+                                loadingIndicatorSource={require('@assets/img/dae_pung1.png')}
+                                key={index}
+                                source={
+                                    item
+                                        ? {uri: item.image}
+                                        : require('@assets/img/dae_pung1.png')
+                                }
+                            />
+                        );
+                    }}
+                    width={theme.width}
+                    height={theme.scale.heightPercent(55)}
+                />
+            ) : (
+                <Carousel<ImageSourcePropType>
+                    data={
+                        // database[`${item.key}`][item.index[0]].items[item.index[1]]
+                        //     .images
+                        [1]
+                    }
+                    renderItem={({item, index}) => {
+                        return (
+                            <Background
+                                // onLoad={() => {
+                                //
+                                // }}
+                                key={index}
+                                source={
+                                    item
+                                        ? item
+                                        : require('@assets/img/dae_pung1.png')
+                                }
+                            />
+                        );
+                    }}
+                    width={theme.width}
+                    height={theme.scale.heightPercent(55)}
+                />
+            )}
+
             <CouponModal open={open} close={handleClose} data={item.coupon} />
         </Container>
     );
@@ -132,6 +185,8 @@ const Container = styled.View<{color: string}>`
 
 const Background = styled.ImageBackground`
     flex: 1;
+    width: 100%;
+    height: 100%;
 `;
 
 const Content = styled.View`
@@ -152,7 +207,7 @@ const ButtonContainer = styled.View`
 
 const Button = styled.TouchableOpacity`
     background-color: ${({theme}: any) => theme.colors.jade};
-    height: 100%;
+    height: ${({theme}: any) => theme.scale.width(40)}px;
     width: ${({theme}: any) => theme.scale.width(100)}px;
     flex-direction: row;
     align-items: center;

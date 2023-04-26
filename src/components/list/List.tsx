@@ -1,11 +1,11 @@
 import BoxPaddingX from '@/atoms/containers/BoxPaddingX';
-import {useNavigation} from '@react-navigation/native';
 import {ScrollView} from 'react-native';
 import styled from 'styled-components/native';
 import HorizontalList from './HolizontalList';
-import {useMemo} from 'react';
-import database from '@/lib/database';
+import {useEffect, useMemo, useState} from 'react';
 import ListItem from '@/components/list/item/ListItem';
+import api from '@/api/axios';
+import {TextNormal} from '@/atoms/text';
 
 const list = [
     {
@@ -35,7 +35,23 @@ const list = [
 ];
 
 export default function List(props: any) {
-    const navigation = useNavigation<any>();
+    const navigation = props.navigation;
+    const [category, setCategory] = useState<any>({});
+    const [data, setData] = useState<any>([]);
+
+    useEffect(() => {
+        api.get(`/category/${props.route.params.id}`).then(res => {
+            if (res.data) {
+                setCategory(res.data);
+
+                if (res.data.subCategory && res.data.subCategory.length > 0) {
+                    setData(res.data.subCategory);
+                } else {
+                    setData(res.data.items);
+                }
+            }
+        });
+    }, []);
 
     const title = useMemo(() => {
         return props.route.params.title;
@@ -47,12 +63,6 @@ export default function List(props: any) {
         return require('@assets/header/gifts.png');
     }, [props.route]);
 
-    const data = useMemo(() => {
-        if (title === '관광명소') return database.attractions;
-        if (title === '기념품') return database.gifts;
-        return database.attractions;
-    }, [title]);
-
     return (
         <ScrollView
             style={{
@@ -60,9 +70,17 @@ export default function List(props: any) {
             }}>
             <Background source={headerImage} />
             <BoxPaddingX>
+                {data.length === 0 && (
+                    <BoxPaddingX>
+                        <TextNormal
+                            style={{textAlign: 'center', marginTop: 20}}>
+                            준비중입니다.
+                        </TextNormal>
+                    </BoxPaddingX>
+                )}
                 {title === '관광명소' &&
                     data.map((item, index) => (
-                        <HorizontalList key={item.category} item={item} />
+                        <HorizontalList key={item.id} item={item} {...props} />
                     ))}
                 {title === '기념품' &&
                     data.map((item, index) => {
@@ -70,16 +88,13 @@ export default function List(props: any) {
                             <ListItem
                                 index={index}
                                 key={index}
-                                icon={item.icon}
-                                title={item.title}
-                                subtitle={item.subtitle}
-                                description={item.description}
-                                backgroundImage={item.backgroundImage}
+                                item={item}
                                 onPress={() => {
                                     navigation.navigate('List', {
-                                        title: item.category,
+                                        title: item.name.replace(' ', ''),
                                         items: item.items,
                                         category: item.category,
+                                        id: item.id,
                                     });
                                 }}
                             />

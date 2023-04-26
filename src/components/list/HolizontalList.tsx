@@ -3,76 +3,147 @@ import {TextLarge, TextNormal, TextTiny} from '@/atoms/text';
 import {theme} from '@/style/theme';
 import {faAngleRight} from '@fortawesome/free-solid-svg-icons';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
-import {useNavigation} from '@react-navigation/native';
 import {ImageBackground, TouchableOpacity, View} from 'react-native';
 import Carousel from 'react-native-reanimated-carousel';
 import styled from 'styled-components/native';
+import {useEffect, useState} from 'react';
+import api from '@/api/axios';
 
 export default function HorizontalList(props: any) {
-    const navigation = useNavigation<any>();
-    return (
+    const navigation = props.navigation;
+    const [data, setData] = useState<any>(null);
+    useEffect(() => {
+        if (props.item.items) {
+            api.get(`/category/${props.item.id}`).then(res => {
+                if (res.data) {
+                    console.log('----------------------------');
+                    console.log(res.data);
+                    console.log('----------------------------');
+                    if (
+                        res.data.subCategory &&
+                        res.data.subCategory.length > 0
+                    ) {
+                        setData(res.data.subCategory);
+                    } else {
+                        setData(res.data.items);
+                    }
+                }
+            });
+        }
+    }, [props.route]);
+
+    return data ? (
         <SubCategoryContainer>
             <TitleContainer>
-                <TextLarge>{props.item.category}</TextLarge>
+                <TextLarge>{props.item.category || props.item.name}</TextLarge>
             </TitleContainer>
-            <Carousel
-                style={{flex: 7, width: theme.width}}
-                width={theme.scale.calc(800)}
-                height={theme.scale.calc(950)}
-                data={props.item.items}
-                loop={false}
-                renderItem={({item}: any) => {
-                    return (
-                        <ItemContainer key={item.name}>
-                            <ImgContainer source={item.images[0]}>
-                                <TouchableOpacity
-                                    onPress={() => {
-                                        navigation.navigate('Detail', {
-                                            detailType: 'attraction',
-                                            item: item,
-                                            images: item.images,
-                                        });
-                                    }}
-                                    style={{
-                                        width: '100%',
-                                        height: '100%',
-                                        backgroundColor:
-                                            theme.colors.setOpacity(
-                                                '0,0,0',
-                                                0.1,
-                                            ),
-                                    }}
-                                />
-                            </ImgContainer>
-                            <InfoContainer>
-                                <View>
-                                    <TextNormal>{item.name}</TextNormal>
-                                    <TextTiny color={theme.colors.darkGray}>
-                                        {item.subtitle}
-                                    </TextTiny>
-                                </View>
-                                <TouchableOpacity
-                                    onPress={() => {
-                                        navigation.navigate('Detail', {
-                                            detailType: 'attraction',
-                                            item: item,
-                                            images: item.images,
-                                        });
-                                    }}>
-                                    <FlexBox>
-                                        <TextTiny>자세히 알아보기</TextTiny>
-                                        <FontAwesomeIcon
-                                            icon={faAngleRight}
-                                            size={10}
-                                        />
-                                    </FlexBox>
-                                </TouchableOpacity>
-                            </InfoContainer>
-                        </ItemContainer>
-                    );
-                }}
-            />
+
+            {props.item && props?.item.items.length < 1 ? (
+                <View
+                    style={{
+                        flex: 1,
+                    }}>
+                    <ItemContainer>
+                        <ImgContainer source={require('@assets/img/logo.png')}>
+                            <TouchableOpacity
+                                style={{
+                                    width: '100%',
+                                    height: '100%',
+                                    backgroundColor: theme.colors.setOpacity(
+                                        '0,0,0',
+                                        0.1,
+                                    ),
+                                }}
+                            />
+                        </ImgContainer>
+                        <InfoContainer>
+                            <View>
+                                <TextNormal>데이터가 없습니다</TextNormal>
+                                <TextTiny
+                                    color={theme.colors.darkGray}></TextTiny>
+                            </View>
+                            <TouchableOpacity>
+                                <FlexBox>
+                                    <TextTiny>자세히 알아보기</TextTiny>
+                                    <FontAwesomeIcon
+                                        icon={faAngleRight}
+                                        size={10}
+                                    />
+                                </FlexBox>
+                            </TouchableOpacity>
+                        </InfoContainer>
+                    </ItemContainer>
+                </View>
+            ) : (
+                <Carousel<any>
+                    style={{flex: 7, width: theme.width}}
+                    width={theme.scale.calc(800)}
+                    height={theme.scale.calc(950)}
+                    data={data}
+                    loop={false}
+                    renderItem={({item, index}) => {
+                        return (
+                            <ItemContainer key={item.name}>
+                                <ImgContainer
+                                    source={
+                                        item.images?.length > 0
+                                            ? {uri: item.images[0].image}
+                                            : require('@assets/logo.png')
+                                        // require('@assets/logo.png')
+                                    }>
+                                    <TouchableOpacity
+                                        onPress={() => {
+                                            navigation.navigate('Detail', {
+                                                detailType: 'attraction',
+                                                item: item,
+                                                images: item.images,
+                                                title: item.name,
+                                            });
+                                        }}
+                                        style={{
+                                            width: '100%',
+                                            height: '100%',
+                                            backgroundColor:
+                                                theme.colors.setOpacity(
+                                                    '0,0,0',
+                                                    0.1,
+                                                ),
+                                        }}
+                                    />
+                                </ImgContainer>
+                                <InfoContainer>
+                                    <View>
+                                        <TextNormal>{item.name}</TextNormal>
+                                        <TextTiny color={theme.colors.darkGray}>
+                                            {item.subtitle}
+                                        </TextTiny>
+                                    </View>
+                                    <TouchableOpacity
+                                        onPress={() => {
+                                            navigation.navigate('Detail', {
+                                                detailType: 'attraction',
+                                                item: item,
+                                            });
+                                        }}>
+                                        <FlexBox>
+                                            <TextTiny>자세히 알아보기</TextTiny>
+                                            <FontAwesomeIcon
+                                                icon={faAngleRight}
+                                                size={10}
+                                            />
+                                        </FlexBox>
+                                    </TouchableOpacity>
+                                </InfoContainer>
+                            </ItemContainer>
+                        );
+                    }}
+                />
+            )}
         </SubCategoryContainer>
+    ) : (
+        <View>
+            <TextNormal>loading...</TextNormal>
+        </View>
     );
 }
 
@@ -100,6 +171,8 @@ const ItemContainer = styled.View`
 const ImgContainer = styled(ImageBackground).attrs({
     resizeMode: 'cover',
 })`
+    width: 100%;
+    height: 100%;
     flex: 8;
 `;
 

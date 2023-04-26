@@ -4,111 +4,123 @@ import FlexBox from '@/atoms/containers/FlexBox';
 import FlexColumn from '@/atoms/containers/FlexColumn';
 import Gap from '@/atoms/containers/Gap';
 import GradientBox from '@/atoms/containers/GradientBox';
-import BottomShadow from '@/atoms/shadow/BottomShadow';
 import {
-    Bold,
     Light,
     SemiBold,
     Text14,
     TextLarge,
     TextNormal,
     TextSmall,
-    TextTiny,
 } from '@/atoms/text';
 import {theme} from '@/style/theme';
 import {
     faBookmark,
     faEye,
     faHeart,
-    faShare,
     faShareNodes,
 } from '@fortawesome/free-solid-svg-icons';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {Dimensions, View} from 'react-native';
-import {Shadow} from 'react-native-shadow-2';
 import styled from 'styled-components/native';
 
 export default function Review(props: any) {
     const width = Dimensions.get('window').width;
-    return (
+    const item = props.route.params.items[0];
+
+    return item ? (
         <CScrollView>
             <BoxPaddingX>
                 <FlexColumn>
                     <Gap size={10} />
                     <TextLarge>
-                        <SemiBold>코스모스 리조트</SemiBold>
+                        <SemiBold>{item}</SemiBold>
                     </TextLarge>
-                    <TextSmall color={theme.colors.gray}>
-                        경북 울릉군 북면 추산길 88-13
-                    </TextSmall>
+                    <TextSmall color={theme.colors.gray}>{item}</TextSmall>
                 </FlexColumn>
             </BoxPaddingX>
             <Gap size={10} />
             <FlexColumn>
-                <GradientBox gradient={theme.colors.lightGrayGradient}>
-                    <ReviewContainer>
-                        <ReviewTitle>
-                            <FlexBox gap={10}>
-                                <Avatar
-                                    source={require('@assets/img/gift_background.png')}
+                {item.reviews &&
+                    item.reviews.length > 0 &&
+                    item.reviews.map((review: any) => (
+                        <GradientBox
+                            gradient={theme.colors.lightGrayGradient}
+                            key={review.id}>
+                            <ReviewContainer>
+                                <ReviewTitle>
+                                    <FlexBox gap={10}>
+                                        <Avatar
+                                            source={
+                                                review.image.includes(
+                                                    'base64',
+                                                ) ||
+                                                require('@assets/img/dae_pung1.png')
+                                            }
+                                        />
+                                        <TextNormal>
+                                            <Light>{review.user}</Light>
+                                        </TextNormal>
+                                    </FlexBox>
+                                </ReviewTitle>
+                                <ReviewPhoto
+                                    width={width}
+                                    source={
+                                        review.image.includes('base64') ||
+                                        require('@assets/img/dae_pung1.png')
+                                    }
                                 />
-                                <TextNormal>
-                                    <Light>김민수</Light>
-                                </TextNormal>
-                            </FlexBox>
-                        </ReviewTitle>
-                        <ReviewPhoto
-                            width={width}
-                            source={require('@assets/img/banner.png')}
-                        />
-                        <ReviewContent>
-                            <Text14>
-                                아쿠아리움 같지만 찐 6M 바닷속 물고기들을 볼 수
-                                있어서 색다른 기분 🐠💙
-                            </Text14>
-                        </ReviewContent>
-                        <ReviewBottom>
-                            <IconContainer>
-                                <FontAwesomeIcon
-                                    icon={faEye}
-                                    color={theme.colors.darkGray}
-                                />
-                                <TextSmall color={theme.colors.darkGray}>
-                                    50
-                                </TextSmall>
-                            </IconContainer>
-                            <IconContainer>
-                                <FontAwesomeIcon
-                                    icon={faBookmark}
-                                    color={theme.colors.darkGray}
-                                />
-                                <TextSmall color={theme.colors.darkGray}>
-                                    50
-                                </TextSmall>
-                            </IconContainer>
-                            <IconContainer>
-                                <FontAwesomeIcon
-                                    icon={faShareNodes}
-                                    color={theme.colors.darkGray}
-                                />
-                                <TextSmall color={theme.colors.darkGray}>
-                                    50
-                                </TextSmall>
-                            </IconContainer>
-                            <ReviewLikeContainer>
-                                <FontAwesomeIcon
-                                    icon={faHeart}
-                                    color={theme.colors.darkGray}
-                                />
-                                <TextSmall color={theme.colors.darkGray}>
-                                    50
-                                </TextSmall>
-                            </ReviewLikeContainer>
-                        </ReviewBottom>
-                    </ReviewContainer>
-                </GradientBox>
+                                <ReviewContent>
+                                    <Text14>{review.description}</Text14>
+                                </ReviewContent>
+                                <ReviewBottom>
+                                    <IconContainer>
+                                        <FontAwesomeIcon
+                                            icon={faEye}
+                                            color={theme.colors.darkGray}
+                                        />
+                                        <TextSmall
+                                            color={theme.colors.darkGray}>
+                                            {review.views}
+                                        </TextSmall>
+                                    </IconContainer>
+                                    <IconContainer>
+                                        <FontAwesomeIcon
+                                            icon={faBookmark}
+                                            color={theme.colors.darkGray}
+                                        />
+                                        <TextSmall
+                                            color={theme.colors.darkGray}>
+                                            {review.bookmarks}
+                                        </TextSmall>
+                                    </IconContainer>
+                                    <IconContainer>
+                                        <FontAwesomeIcon
+                                            icon={faShareNodes}
+                                            color={theme.colors.darkGray}
+                                        />
+                                        <TextSmall
+                                            color={theme.colors.darkGray}>
+                                            {review.shared}
+                                        </TextSmall>
+                                    </IconContainer>
+                                    <ReviewLikeContainer>
+                                        <FontAwesomeIcon
+                                            icon={faHeart}
+                                            color={theme.colors.darkGray}
+                                        />
+                                        <TextSmall
+                                            color={theme.colors.darkGray}>
+                                            {review.like}
+                                        </TextSmall>
+                                    </ReviewLikeContainer>
+                                </ReviewBottom>
+                            </ReviewContainer>
+                        </GradientBox>
+                    ))}
             </FlexColumn>
         </CScrollView>
+    ) : (
+        <View></View>
     );
 }
 const IconContainer = styled.View`

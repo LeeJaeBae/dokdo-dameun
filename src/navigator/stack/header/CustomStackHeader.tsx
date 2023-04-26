@@ -6,8 +6,9 @@ import tailwind from 'twrnc';
 import Home from '@assets/icon/home.png';
 import {TouchableOpacity} from 'react-native-gesture-handler';
 import {theme} from '@/style/theme';
-import {useMemo} from 'react';
+import {useEffect, useMemo, useState} from 'react';
 import styled from 'styled-components/native';
+import api from '@/api/axios';
 
 type CustomStackHeaderProps = StackHeaderProps | {title: string};
 
@@ -17,6 +18,13 @@ export default function CustomStackHeader({
     options,
     title,
 }: CustomStackHeaderProps) {
+    const [categories, setCategories] = useState<any[]>([]);
+
+    useEffect(() => {
+        api.get('categories').then(res => {
+            setCategories(res.data);
+        });
+    }, []);
     const header = useMemo(() => {
         if (
             route.params?.transparent === false ||
