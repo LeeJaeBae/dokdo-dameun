@@ -4,16 +4,18 @@ import api from '@/api/axios';
 type CategoryContextType = {
     categories: any[];
     selectedCategory: any;
+    selectCategory: (category: any) => void;
 };
 
 const CategoryContext = createContext<CategoryContextType>({
     categories: [],
     selectedCategory: {},
+    selectCategory: () => {},
 });
 
 export const CategoryProvider = (props: any) => {
     const [categories, setCategories] = useState<any[]>([]);
-    const [selectedCategory, setSelectedCategory] = useState<any>({});
+    const [selectedCategory, setSelectedCategory] = useState<any>();
     useEffect(() => {
         api.get('categories').then(res => {
             setCategories(res.data);
@@ -23,6 +25,15 @@ export const CategoryProvider = (props: any) => {
         return {
             categories,
             selectedCategory,
+            selectCategory: (id: string) => {
+                const category = categories.find(
+                    _category => _category.id === id,
+                );
+                if (!category) {
+                    return null;
+                }
+                setSelectedCategory(category);
+            },
         };
     }, [categories, selectedCategory]);
 

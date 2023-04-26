@@ -6,31 +6,15 @@ import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {ImageBackground, TouchableOpacity, View} from 'react-native';
 import Carousel from 'react-native-reanimated-carousel';
 import styled from 'styled-components/native';
-import {useEffect, useState} from 'react';
-import api from '@/api/axios';
+import {useMemo} from 'react';
+import {useCategory} from '@/lib/context/CategoryContext';
 
 export default function HorizontalList(props: any) {
     const navigation = props.navigation;
-    const [data, setData] = useState<any>(null);
-    useEffect(() => {
-        if (props.item.items) {
-            api.get(`/category/${props.item.id}`).then(res => {
-                if (res.data) {
-                    console.log('----------------------------');
-                    console.log(res.data);
-                    console.log('----------------------------');
-                    if (
-                        res.data.subCategory &&
-                        res.data.subCategory.length > 0
-                    ) {
-                        setData(res.data.subCategory);
-                    } else {
-                        setData(res.data.items);
-                    }
-                }
-            });
-        }
-    }, [props.route]);
+    const {selectedCategory} = useCategory();
+    const data = useMemo(() => {
+        return props.item.items;
+    }, [selectedCategory]);
 
     return data ? (
         <SubCategoryContainer>
@@ -85,12 +69,13 @@ export default function HorizontalList(props: any) {
                         return (
                             <ItemContainer key={item.name}>
                                 <ImgContainer
-                                    source={
-                                        item.images?.length > 0
-                                            ? {uri: item.images[0].image}
-                                            : require('@assets/logo.png')
-                                        // require('@assets/logo.png')
-                                    }>
+                                    // style={{
+                                    //     width: theme.scale.calc(800),
+                                    //     height: theme.scale.calc(950),
+                                    // }}
+                                    source={{
+                                        uri: 'asset:/images/1. 관광명소/1. 도동/1. 섬일주유람선/섬일주유람선-1.jpg',
+                                    }}>
                                     <TouchableOpacity
                                         onPress={() => {
                                             navigation.navigate('Detail', {

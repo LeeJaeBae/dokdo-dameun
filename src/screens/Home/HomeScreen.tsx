@@ -25,7 +25,7 @@ const LogoImage = styled.ImageBackground`
 export default function HomeScreen(props: any) {
     const {navigation} = props;
     const width = Dimensions.get('window').width;
-    const {categories} = useCategory();
+    const {categories, selectCategory} = useCategory();
     // const [categories, setCategories] = useState<any[]>([]);
     //
     // useEffect(() => {
@@ -118,6 +118,7 @@ export default function HomeScreen(props: any) {
                                   title: category.name,
                                   image: icon(category.name),
                                   onPress: () => {
+                                      selectCategory(category.id);
                                       navigation.push('Category', {
                                           title: category.name,
                                           category: category.type,

@@ -22,3 +22,21 @@ export default function CoreNavigator() {
         </NavigationContainer>
     );
 }
+/* -- bash
+
+
+--
+
+ */
+
+// delete string regex in bash shell
+// for i in *; do mv "$i" "${i//sometext/}"; done
+
+// delete ' ' in bash shell
+// for i in *; do mv "$i" "${i// /}"; done
+
+// change string regex in bash shell text1 to ''
+// for i in *; do mv "$i" "${i//text1/}"; done
+
+// rename * to 'sometext+index' in bash shell with regex
+// for i in *; do mv "$i" "sometext${i}"; done

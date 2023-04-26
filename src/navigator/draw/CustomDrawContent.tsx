@@ -8,7 +8,7 @@ import styled from 'styled-components/native';
 import FlexBox from '@/atoms/containers/FlexBox';
 import {Text14} from '@/atoms/text';
 import {useCategory} from '@/lib/context/CategoryContext';
-import {useEffect} from 'react';
+
 
 function CustomDrawerContent(props: DrawerContentComponentProps) {
     const {categories} = useCategory();
@@ -32,10 +32,6 @@ function CustomDrawerContent(props: DrawerContentComponentProps) {
                 return require('@assets/icon/attraction.png');
         }
     };
-
-    useEffect(() => {
-        console.log('CustomDrawerContent', categories);
-    });
 
     return (
         <DrawerContentScrollView {...props} scrollEnabled={false}>
