@@ -12,15 +12,16 @@ import {useEffect, useState} from 'react';
 import {View} from 'react-native';
 import styled from 'styled-components/native';
 import api from '@/api/axios';
-import Carousel from 'react-native-reanimated-carousel';
 import TextSize from '@/atoms/text/TextSize';
 import FlexBox from '@/atoms/containers/FlexBox';
 import {faClock} from '@fortawesome/free-regular-svg-icons';
+import {useCategory} from '@/lib/context/CategoryContext';
 
 export default function CafeDetailComponent(props: any) {
     const navigation = props.navigation;
 
     const [data, setData] = useState<any>();
+    const {getUrl} = useCategory();
 
     useEffect(() => {
         api.get(`/item/${props.route.params.id}`).then(res => {
@@ -42,29 +43,10 @@ export default function CafeDetailComponent(props: any) {
 
     return data ? (
         <Container>
-            <Carousel<any>
-                data={
-                    // database[`${item.key}`][item.index[0]].items[item.index[1]]
-                    //     .images
-                    data.images.length < 1
-                        ? [data.information.join()]
-                        : data.images
-                }
-                renderItem={({item, index}) => {
-                    return (
-                        <Background
-                            // onLoad={() => {
-                            //
-                            // }}
-                            key={index}
-                            source={
-                                item.image ? {uri: item.image} : {uri: item}
-                            }
-                        />
-                    );
+            <Background
+                source={{
+                    uri: getUrl(data.url),
                 }}
-                width={theme.width}
-                height={theme.scale.heightPercent(55)}
             />
 
             <Content>

@@ -44,90 +44,101 @@ export default function SingleList(props: any) {
                 renderItem={({item, index}) => {
                     const {color}: {color: string} = item;
                     return (
-                        <TileContainer
-                            key={item.name}
-                            isPadding={false}
-                            gradient={
-                                color.split(',').length === 2
-                                    ? color.split(',')
-                                    : [color, color]
-                            }
-                            height={theme.scale.width(180)}>
-                            <View
-                                style={{
-                                    position: 'absolute',
-                                    width: '100%',
-                                    height: theme.scale.width(130),
-                                    backgroundColor: color.split(',')[0],
-                                }}
-                            />
-                            <View
-                                style={{
-                                    position: 'absolute',
-                                    width: '100%',
-                                    height: theme.scale.width(70),
-                                    backgroundColor: color.split(',')[1],
-                                    bottom: 0,
-                                }}
-                            />
-                            <ImageBackground
-                                source={{
-                                    uri: getUrl(item.url),
-                                }}
-                                style={{
-                                    width: '100%',
-                                    height: 140,
-                                    position: 'absolute',
-                                    bottom: 0,
-                                }}
-                            />
-                            <View
-                                style={{
-                                    flex: 1,
-                                    padding: 10,
-                                }}>
+                        <TouchableOpacity
+                            onPress={() => {
+                                navigation.push('WaveDetail', {
+                                    id: item.id,
+                                    noBottom: true,
+                                    title: item.name,
+                                });
+                            }}>
+                            <TileContainer
+                                key={item.name}
+                                isPadding={false}
+                                gradient={
+                                    color.split(',').length === 2
+                                        ? color.split(',')
+                                        : [color, color]
+                                }
+                                height={theme.scale.width(180)}>
+                                <View
+                                    style={{
+                                        position: 'absolute',
+                                        width: '100%',
+                                        height: theme.scale.width(130),
+                                        backgroundColor: color.split(',')[0],
+                                    }}
+                                />
+                                <View
+                                    style={{
+                                        position: 'absolute',
+                                        width: '100%',
+                                        height: theme.scale.width(70),
+                                        backgroundColor: color.split(',')[1],
+                                        bottom: 0,
+                                    }}
+                                />
+                                <ImageBackground
+                                    source={{
+                                        uri: getUrl(item.url),
+                                    }}
+                                    style={{
+                                        width: '100%',
+                                        height: 140,
+                                        position: 'absolute',
+                                        bottom: 0,
+                                    }}
+                                />
                                 <View
                                     style={{
                                         flex: 1,
-                                        alignItems:
-                                            index % 2 === 0
-                                                ? 'flex-start'
-                                                : 'flex-end',
-                                        paddingTop: 30,
+                                        padding: 10,
                                     }}>
-                                    <Text style={GlobalStyle.textLight}>
-                                        {item.information[0]}
-                                    </Text>
-                                    <Text
-                                        style={GlobalStyle.title}
-                                        lineBreakMode="head">
-                                        {item.information[1]}
-                                    </Text>
-                                </View>
-                                <View>
-                                    <TextSmall size={12}>
-                                        {item.information[2]}
-                                    </TextSmall>
-                                </View>
-                                <View
-                                    style={{
-                                        display: 'flex',
-                                        justifyContent:
-                                            index % 2 === 0
-                                                ? 'flex-start'
-                                                : 'flex-end',
-                                        alignItems: 'center',
-                                        flexDirection: 'row',
-                                        width: '100%',
-                                        paddingBottom: 10,
-                                    }}>
-                                    <TouchableOpacity
-                                        onPress={() => {
-                                            navigation.push('WaveDetail', {
-                                                id: item.id,
-                                                noBottom: true,
-                                                title: item.name,
-                                            });
+                                    <View
+                                        style={{
+                                            flex: 1,
+                                            alignItems:
+                                                index % 2 === 0
+                                                    ? 'flex-start'
+                                                    : 'flex-end',
+                                            paddingTop: 30,
+                                        }}>
+                                        <Text style={GlobalStyle.textLight}>
+                                            {item.information[0]}
+                                        </Text>
+                                        <Text
+                                            style={GlobalStyle.title}
+                                            lineBreakMode="head">
+                                            {item.information[1]}
+                                        </Text>
+                                    </View>
+                                    <View
+                                        style={{
+                                            display: 'flex',
+                                            justifyContent:
+                                                index % 2 === 0
+                                                    ? 'flex-start'
+                                                    : 'flex-end',
+                                            alignItems: 'center',
+                                            flexDirection: 'row',
+                                            width: '100%',
+                                            paddingBottom: 10,
+                                        }}>
+                                        <TextSmall size={12}>
+                                            {item.information[2]}
+                                        </TextSmall>
+                                    </View>
+                                    <View
+                                        style={{
+                                            display: 'flex',
+                                            justifyContent:
+                                                index % 2 === 0
+                                                    ? 'flex-start'
+                                                    : 'flex-end',
+                                            alignItems: 'center',
+                                            flexDirection: 'row',
+                                            width: '100%',
+                                            paddingBottom: 10,
                                         }}>
                                         <View
                                             style={{
@@ -155,10 +166,10 @@ export default function SingleList(props: any) {
                                                 size={12}
                                             />
                                         </View>
-                                    </TouchableOpacity>
+                                    </View>
                                 </View>
-                            </View>
-                        </TileContainer>
+                            </TileContainer>
+                        </TouchableOpacity>
                     );
                 }}
                 keyExtractor={item => item.name.toString()}

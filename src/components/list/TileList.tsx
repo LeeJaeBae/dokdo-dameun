@@ -72,43 +72,49 @@ export default function TileList(props: any) {
                             />
                             <BoxPaddingX>
                                 <BoxPaddingY>
-                                    <BoxPaddingY>
-                                        <Text style={GlobalStyle.textLight}>
-                                            {item.information[0]}
-                                        </Text>
-                                        <Text
-                                            style={GlobalStyle.title}
-                                            lineBreakMode="head">
-                                            {breakWords(item.information[1], 6)}
-                                        </Text>
-                                    </BoxPaddingY>
+                                    <TouchableOpacity
+                                        onPress={() => {
+                                            navigation.push('WaveDetail', {
+                                                id: item.id,
+                                                title: item.title,
+                                            });
+                                        }}>
+                                        <BoxPaddingY>
+                                            <Text style={GlobalStyle.textLight}>
+                                                {item.information[0]}
+                                            </Text>
+                                            <Text
+                                                style={GlobalStyle.title}
+                                                lineBreakMode="head">
+                                                {breakWords(
+                                                    item.information[1],
+                                                    6,
+                                                )}
+                                            </Text>
+                                        </BoxPaddingY>
 
-                                    <Text
-                                        style={{
-                                            ...GlobalStyle.textTiny,
-                                            ...{
-                                                textDecorationStyle: 'solid',
-                                                textDecorationLine: 'underline',
-                                            },
-                                        }}>
-                                        {item.information[2]}
-                                        {'\n'}
-                                        {item.information[3]}
-                                    </Text>
-                                    <Gap size={theme.scale.width(55)} />
-                                    <View
-                                        style={{
-                                            display: 'flex',
-                                            justifyContent: 'flex-end',
-                                            alignItems: 'center',
-                                            flexDirection: 'row',
-                                            width: '100%',
-                                        }}>
-                                        <TouchableOpacity
-                                            onPress={() => {
-                                                navigation.push('WaveDetail', {
-                                                    id: item.id,
-                                                });
+                                        <Text
+                                            style={{
+                                                ...GlobalStyle.textTiny,
+                                                ...{
+                                                    textDecorationStyle:
+                                                        'solid',
+                                                    textDecorationLine:
+                                                        'underline',
+                                                },
+                                            }}>
+                                            {item.information[2]}
+                                            {'\n'}
+                                            {item.information[3]}
+                                        </Text>
+                                        <Gap size={theme.scale.width(55)} />
+                                        <View
+                                            style={{
+                                                display: 'flex',
+                                                justifyContent: 'flex-end',
+                                                alignItems: 'center',
+                                                flexDirection: 'row',
+                                                width: '100%',
                                             }}>
                                             <View
                                                 style={{
@@ -139,8 +145,8 @@ export default function TileList(props: any) {
                                                     size={12}
                                                 />
                                             </View>
-                                        </TouchableOpacity>
-                                    </View>
+                                        </View>
+                                    </TouchableOpacity>
                                 </BoxPaddingY>
                             </BoxPaddingX>
                         </TileContainer>
@@ -183,43 +189,49 @@ export default function TileList(props: any) {
                             />
                             <BoxPaddingX>
                                 <BoxPaddingY>
-                                    <BoxPaddingY>
-                                        <Text style={GlobalStyle.textLight}>
-                                            {item.information[0]}
-                                        </Text>
-                                        <Text
-                                            style={GlobalStyle.title}
-                                            lineBreakMode="head">
-                                            {breakWords(item.information[1], 6)}
-                                        </Text>
-                                    </BoxPaddingY>
+                                    <TouchableOpacity
+                                        onPress={() => {
+                                            navigation.push('WaveDetail', {
+                                                id: item.id,
+                                                title: item.title,
+                                            });
+                                        }}>
+                                        <BoxPaddingY>
+                                            <Text style={GlobalStyle.textLight}>
+                                                {item.information[0]}
+                                            </Text>
+                                            <Text
+                                                style={GlobalStyle.title}
+                                                lineBreakMode="head">
+                                                {breakWords(
+                                                    item.information[1],
+                                                    6,
+                                                )}
+                                            </Text>
+                                        </BoxPaddingY>
 
-                                    <Text
-                                        style={{
-                                            ...GlobalStyle.textTiny,
-                                            ...{
-                                                textDecorationStyle: 'solid',
-                                                textDecorationLine: 'underline',
-                                            },
-                                        }}>
-                                        {item.information[2]}
-                                        {'\n'}
-                                        {item.information[3]}
-                                    </Text>
-                                    <Gap size={theme.scale.width(55)} />
-                                    <View
-                                        style={{
-                                            display: 'flex',
-                                            justifyContent: 'flex-end',
-                                            alignItems: 'center',
-                                            flexDirection: 'row',
-                                            width: '100%',
-                                        }}>
-                                        <TouchableOpacity
-                                            onPress={() => {
-                                                navigation.push('WaveDetail', {
-                                                    id: item.id,
-                                                });
+                                        <Text
+                                            style={{
+                                                ...GlobalStyle.textTiny,
+                                                ...{
+                                                    textDecorationStyle:
+                                                        'solid',
+                                                    textDecorationLine:
+                                                        'underline',
+                                                },
+                                            }}>
+                                            {item.information[2]}
+                                            {'\n'}
+                                            {item.information[3]}
+                                        </Text>
+                                        <Gap size={theme.scale.width(55)} />
+                                        <View
+                                            style={{
+                                                display: 'flex',
+                                                justifyContent: 'flex-end',
+                                                alignItems: 'center',
+                                                flexDirection: 'row',
+                                                width: '100%',
                                             }}>
                                             <View
                                                 style={{
@@ -250,8 +262,8 @@ export default function TileList(props: any) {
                                                     size={12}
                                                 />
                                             </View>
-                                        </TouchableOpacity>
-                                    </View>
+                                        </View>
+                                    </TouchableOpacity>
                                 </BoxPaddingY>
                             </BoxPaddingX>
                         </TileContainer>

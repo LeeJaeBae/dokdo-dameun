@@ -9,7 +9,6 @@ import FlexBox from '@/atoms/containers/FlexBox';
 import {Text14} from '@/atoms/text';
 import {useCategory} from '@/lib/context/CategoryContext';
 
-
 function CustomDrawerContent(props: DrawerContentComponentProps) {
     const {categories} = useCategory();
     const navigation = props.navigation;
@@ -17,19 +16,19 @@ function CustomDrawerContent(props: DrawerContentComponentProps) {
     const icon = (name: string) => {
         switch (name) {
             case '관광명소':
-                return require('@assets/icon/attraction.png');
+                return require('@assets/icon/attraction.webp');
             case '기념품':
-                return require('@assets/icon/gifts.png');
+                return require('@assets/icon/gifts.webp');
             case '카페·먹거리':
-                return require('@assets/icon/cafe.png');
+                return require('@assets/icon/cafe.webp');
             case '숙소':
-                return require('@assets/icon/hotel.png');
+                return require('@assets/icon/hotel.webp');
             case '안주거리':
-                return require('@assets/icon/drink.png');
+                return require('@assets/icon/drink.webp');
             case '맛집':
-                return require('@assets/icon/food.png');
+                return require('@assets/icon/food.webp');
             default:
-                return require('@assets/icon/attraction.png');
+                return require('@assets/icon/attraction.webp');
         }
     };
 

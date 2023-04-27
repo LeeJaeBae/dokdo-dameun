@@ -38,17 +38,17 @@ export default function HomeScreen(props: any) {
         () => (name: string) => {
             switch (name) {
                 case '관광명소':
-                    return require('@assets/icon/attraction.png');
+                    return require('@assets/icon/attraction.webp');
                 case '기념품':
-                    return require('@assets/icon/gifts.png');
+                    return require('@assets/icon/gifts.webp');
                 case '카페·먹거리':
-                    return require('@assets/icon/cafe.png');
+                    return require('@assets/icon/cafe.webp');
                 case '숙소':
-                    return require('@assets/icon/hotel.png');
+                    return require('@assets/icon/hotel.webp');
                 case '안주거리':
-                    return require('@assets/icon/drink.png');
+                    return require('@assets/icon/drink.webp');
                 case '맛집':
-                    return require('@assets/icon/food.png');
+                    return require('@assets/icon/food.webp');
             }
         },
         [categories],
@@ -87,9 +87,9 @@ export default function HomeScreen(props: any) {
                         width: '100%',
                     }}
                     data={[
-                        require('@assets/promotion/promotion1.png'),
-                        require('@assets/promotion/promotion2.png'),
-                        require('@assets/promotion/promotion3.png'),
+                        require('@assets/promotion/promotion1.webp'),
+                        require('@assets/promotion/promotion2.webp'),
+                        require('@assets/promotion/promotion3.webp'),
                     ]}
                     scrollAnimationDuration={1000}
                     renderItem={({item, index}) => (
@@ -143,7 +143,7 @@ export default function HomeScreen(props: any) {
                             : [
                                   {
                                       title: '관광명소',
-                                      image: require('@assets/icon/attraction.png'),
+                                      image: require('@assets/icon/attraction.webp'),
                                       onPress: () => {
                                           navigation.navigate('Category', {
                                               title: '관광명소',
@@ -154,7 +154,7 @@ export default function HomeScreen(props: any) {
                                   },
                                   {
                                       title: '기념품',
-                                      image: require('@assets/icon/gifts.png'),
+                                      image: require('@assets/icon/gifts.webp'),
                                       onPress: () => {
                                           navigation.navigate('Category', {
                                               title: '기념품',
@@ -165,7 +165,7 @@ export default function HomeScreen(props: any) {
                                   },
                                   {
                                       title: '카페·먹거리',
-                                      image: require('@assets/icon/cafe.png'),
+                                      image: require('@assets/icon/cafe.webp'),
                                       onPress: () => {
                                           navigation.navigate('Category', {
                                               title: '카페·먹거리',
@@ -176,7 +176,7 @@ export default function HomeScreen(props: any) {
                                   },
                                   {
                                       title: '숙소',
-                                      image: require('@assets/icon/hotel.png'),
+                                      image: require('@assets/icon/hotel.webp'),
                                       onPress: () => {
                                           navigation.navigate('Category', {
                                               title: '숙소',
@@ -186,7 +186,7 @@ export default function HomeScreen(props: any) {
                                   },
                                   {
                                       title: '안주거리',
-                                      image: require('@assets/icon/drink.png'),
+                                      image: require('@assets/icon/drink.webp'),
                                       onPress: () => {
                                           navigation.navigate('Category', {
                                               title: '안주거리',
@@ -196,7 +196,7 @@ export default function HomeScreen(props: any) {
                                   },
                                   {
                                       title: '맛집',
-                                      image: require('@assets/icon/food.png'),
+                                      image: require('@assets/icon/food.webp'),
                                       onPress: () => {
                                           navigation.navigate('Category', {
                                               title: '맛집',

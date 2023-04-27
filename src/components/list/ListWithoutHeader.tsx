@@ -20,11 +20,10 @@ export default function ListWithoutHeader(props: any) {
     const [data, setData] = useState<any>([]);
 
     useEffect(() => {
-        console.log(category);
         setData(props.route.params.items);
     }, [props.route]);
 
-    const [isModalVisible, setModalVisible] = useState(false);
+    const [coupon, setCoupon] = useState<string>('');
 
     return (
         <Container>
@@ -88,7 +87,7 @@ export default function ListWithoutHeader(props: any) {
                                 <Button
                                     backgroundColor={theme.colors.green}
                                     onPress={() => {
-                                        setModalVisible(true);
+                                        setCoupon(item.coupon.id);
                                     }}>
                                     <FlexGrow>
                                         <TextTiny color={theme.colors.white}>
@@ -106,9 +105,9 @@ export default function ListWithoutHeader(props: any) {
                             </Footer>
                         </Content>
                         <CouponModal
-                            open={isModalVisible}
+                            open={coupon === item.coupon.id}
                             close={() => {
-                                setModalVisible(false);
+                                setCoupon('');
                             }}
                             data={item.coupon}
                         />

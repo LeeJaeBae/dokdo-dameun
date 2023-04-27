@@ -10,6 +10,7 @@ import {TAnimationStyle} from 'react-native-reanimated-carousel/lib/typescript/l
 import {interpolate} from 'react-native-reanimated';
 import api from '@/api/axios';
 import {useCategory} from '@/lib/context/CategoryContext';
+import {TouchableOpacity} from 'react-native-gesture-handler';
 
 export default function CafeCategory(props: any) {
     const animationStyle: TAnimationStyle = useCallback((value: number) => {
@@ -29,9 +30,8 @@ export default function CafeCategory(props: any) {
     const mainCard = useRef<ICarouselInstance>(null);
 
     const navigation = props.navigation;
-    const {selectedCategory: category} = useCategory();
+    const {selectedCategory: category, getUrl} = useCategory();
     const [data, setData] = useState<any>([]);
-
     useEffect(() => {
         api.get(`/category/${props.route.params.id}`).then(res => {
             if (res.data) {
@@ -57,43 +57,43 @@ export default function CafeCategory(props: any) {
                 <TextNormal color={theme.colors.white}>
                     <Light>지금이 아니면 놓치고 말 거예요!</Light>
                 </TextNormal>
+
                 <Carousel<any>
                     width={theme.width * 0.7}
                     style={{
                         width: theme.width,
                         position: 'absolute',
-                        top: theme.scale.width(200),
+                        top: theme.scale.width(220),
                     }}
                     data={
-                        category.subCategory && category.subCategory.length > 0
-                            ? category.subCategory[0].items
-                            : []
+                        category.subCategory &&
+                        category.subCategory.find(
+                            (v: any) => v.name === 'promotion',
+                        ).items
                     }
                     renderItem={({item}) => (
                         <HeaderItemWrapper
                             onPress={() => {
                                 navigation.navigate('CafeDetail', {
                                     id: item.id,
+                                    title: item.title,
                                 });
                             }}>
                             <HeaderItem
-                                source={
-                                    item.information.length > 0 &&
-                                    item.information[0].includes('base64')
-                                        ? {
-                                              uri: item.information.join(),
-                                          }
-                                        : require('@assets/img/cafe_background.png')
-                                }>
+                                source={{
+                                    uri: getUrl(item.url),
+                                }}>
                                 <HeaderItemFilter>
                                     <TextSmall color={theme.colors.white}>
-                                        {item.subtitle}
+                                        울릉도 대표간식
                                     </TextSmall>
                                     <TextSize
                                         fontWeight={700}
                                         size={20}
                                         color={theme.colors.white}>
                                         {item.title}
+                                        {'\n'}
+                                        {item.subtitle}
                                     </TextSize>
                                 </HeaderItemFilter>
                             </HeaderItem>
@@ -127,26 +127,33 @@ export default function CafeCategory(props: any) {
                             onPress={() => {
                                 navigation.navigate('CafeDetail', {
                                     id: item.id,
+                                    title: item.title,
                                 });
                             }}>
-                            <PromotionImage
-                                source={
-                                    item.information.length > 0
-                                        ? {uri: item.information.join()}
-                                        : require('@assets/img/cafe_background.png')
-                                }
-                            />
+                            <TouchableOpacity
+                                onPress={() => {
+                                    navigation.navigate('CafeDetail', {
+                                        id: item.id,
+                                        title: item.title,
+                                    });
+                                }}>
+                                <PromotionImage
+                                    source={{
+                                        uri: getUrl(item.url),
+                                    }}
+                                />
+                            </TouchableOpacity>
                             <PromotionInfo>
                                 <TextSmall fontWeight={700}>
                                     {item.title}
                                 </TextSmall>
                                 <TextTiny color={theme.colors.gray}>
-                                    {item.description}
+                                    {item.information}
                                 </TextTiny>
                                 <TextSmall
                                     fontWeight={600}
                                     color={theme.colors.purple}>
-                                    {item.subtitle}
+                                    할인쿠폰 보러가기
                                 </TextSmall>
                             </PromotionInfo>
                         </PromotionItem>
@@ -163,9 +170,10 @@ export default function CafeCategory(props: any) {
                     width={theme.width}
                     height={theme.scale.width(250)}
                     data={
-                        category.subCategory && category.subCategory.length > 2
-                            ? category.subCategory[2].items
-                            : []
+                        category.subCategory &&
+                        category.subCategory.find(
+                            (v: any) => v.name === 'today_cafe',
+                        ).items
                     }
                     loop
                     mode="parallax"
@@ -188,12 +196,9 @@ export default function CafeCategory(props: any) {
                                     alignItems: 'center',
                                 }}>
                                 <RecommendImage
-                                    source={
-                                        item.information &&
-                                        item.information.length > 0
-                                            ? {uri: item.information.join()}
-                                            : require('@assets/img/cafe_background.png')
-                                    }
+                                    source={{
+                                        uri: getUrl(item.url),
+                                    }}
                                 />
                             </View>
                         );
@@ -211,9 +216,10 @@ export default function CafeCategory(props: any) {
                     }}
                     width={theme.width * 0.7}
                     data={
-                        category.subCategory && category.subCategory.length > 2
-                            ? category.subCategory[2].items
-                            : []
+                        category.subCategory &&
+                        category.subCategory.find(
+                            (v: any) => v.name === 'today_cafe',
+                        ).items
                     }
                     customAnimation={animationStyle}
                     panGestureHandlerProps={{
@@ -231,13 +237,14 @@ export default function CafeCategory(props: any) {
                                     onPress={() => {
                                         navigation.navigate('CafeDetail', {
                                             id: item.id,
+                                            title: item.title,
                                         });
                                     }}>
                                     <TextSize size={18} fontWeight={700}>
                                         {item.title}
                                     </TextSize>
                                     <TextSmall color={theme.colors.gray}>
-                                        {item.subtitle}
+                                        {item.information}
                                     </TextSmall>
                                 </RecommendTitle>
                             </View>
@@ -260,7 +267,7 @@ const Container = styled.ScrollView`
 const Header = styled.View`
     flex-direction: column;
     background-color: ${(props: any) => props.theme.colors.black};
-    height: ${(props: any) => props.theme.scale.width(500)}px;
+    height: ${(props: any) => props.theme.scale.width(540)}px;
     width: ${(props: any) => props.theme.width}px;
     padding-top: ${(props: any) => props.theme.scale.width(100)}px;
     padding-horizontal: ${(props: any) => props.theme.scale.width(15)}px;
@@ -268,7 +275,7 @@ const Header = styled.View`
 `;
 
 const HeaderItemWrapper = styled.TouchableOpacity`
-    height: ${(props: any) => props.theme.scale.width(280)}px;
+    height: ${(props: any) => props.theme.scale.width(300)}px;
     width: ${(props: any) => props.theme.scale.widthPercent(65)}px;
     background-color: white;
     margin-left: ${(props: any) => props.theme.scale.width(15)}px;

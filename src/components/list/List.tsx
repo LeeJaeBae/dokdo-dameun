@@ -2,9 +2,8 @@ import BoxPaddingX from '@/atoms/containers/BoxPaddingX';
 import {ScrollView} from 'react-native';
 import styled from 'styled-components/native';
 import HorizontalList from './HolizontalList';
-import {useEffect, useMemo} from 'react';
+import {useMemo} from 'react';
 import ListItem from '@/components/list/item/ListItem';
-import {TextNormal} from '@/atoms/text';
 import {useCategory} from '@/lib/context/CategoryContext';
 
 export default function List(props: any) {
@@ -21,10 +20,6 @@ export default function List(props: any) {
             return selectedCategory.items || [];
         }
         // return selectedCategory.subCategories;
-    }, [selectedCategory]);
-
-    useEffect(() => {
-        selectedCategory;
     }, [selectedCategory]);
 
     const title = useMemo(() => {
@@ -44,14 +39,6 @@ export default function List(props: any) {
             }}>
             <Background source={headerImage} />
             <BoxPaddingX>
-                {data.length === 0 && (
-                    <BoxPaddingX>
-                        <TextNormal
-                            style={{textAlign: 'center', marginTop: 20}}>
-                            준비중입니다.
-                        </TextNormal>
-                    </BoxPaddingX>
-                )}
                 {title === '관광명소' &&
                     data.map((item, index) => (
                         <HorizontalList key={item.id} item={item} {...props} />

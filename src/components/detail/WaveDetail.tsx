@@ -26,6 +26,7 @@ import Carousel from 'react-native-reanimated-carousel';
 import tailwind from 'twrnc';
 import api from '@/api/axios';
 import {useCategory} from '@/lib/context/CategoryContext';
+import {SemiBold} from '@/atoms/text';
 
 export default function WaveDetail(props: any) {
     const [open, setOpen] = useState(false);
@@ -104,7 +105,7 @@ export default function WaveDetail(props: any) {
                     <View>
                         <TextLarge color={'primary'}>{data.title}</TextLarge>
                         <TextSmall>
-                            <Bold>{data.subtitle}</Bold>
+                            <SemiBold>{data.subtitle}</SemiBold>
                         </TextSmall>
                     </View>
                     <View

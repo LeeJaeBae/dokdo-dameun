@@ -8,7 +8,6 @@ import {theme} from '@/style/theme';
 import styled from 'styled-components/native';
 import {Light} from '@/atoms/text';
 import TextSize from '@/atoms/text/TextSize';
-import {useEffect, useState} from 'react';
 import {useCategory} from '@/lib/context/CategoryContext';
 
 type ListItemProps = {
@@ -20,28 +19,15 @@ type ListItemProps = {
 
 export default function ListItem(props: ListItemProps) {
     const {item} = props;
-    const [thumnail, setThumnail] = useState('');
-    const [subtitle, setSubtitle] = useState('');
-    const [description, setDescription] = useState<string>('');
     const {getUrl} = useCategory();
-    useEffect(() => {
-        if (item.items.length > 0) {
-            setThumnail(getUrl(item.items[0].imagesUrl[0]));
-            setSubtitle(item.items[0].subtitle);
-            setDescription(item.items[0].description);
-        }
-    }, [item]);
+
     return (
         <Container onPress={props.onPress}>
             <Left>
                 <Icon
-                    source={
-                        thumnail
-                            ? {
-                                  uri: thumnail,
-                              }
-                            : require('@assets/icon/academy.png')
-                    }
+                    source={{
+                        uri: getUrl(item.items[0].imagesUrl[0]),
+                    }}
                     resizeMode="contain"
                 />
                 <WriteVertical>
@@ -56,25 +42,19 @@ export default function ListItem(props: ListItemProps) {
             <Right>
                 <Background
                     blurRadius={1}
-                    source={
-                        thumnail
-                            ? {
-                                  uri: thumnail,
-                              }
-                            : require('@assets/icon/academy.png')
-                    }>
+                    source={{uri: getUrl(item.items[0].imagesUrl[0])}}>
                     <BackgroundFilter>
                         <TextSmall color={theme.colors.white}>
                             Spacial Product
                         </TextSmall>
                         <TextSize size={20} color={theme.colors.white}>
                             <Light>
-                                <LSpacing>{subtitle}</LSpacing>
+                                <LSpacing>{item.items[0].subtitle}</LSpacing>
                             </Light>
                         </TextSize>
                         <Gap size={2} />
                         <TextTiny color={theme.colors.white}>
-                            {description}
+                            {item.items[0].description}
                         </TextTiny>
                     </BackgroundFilter>
                 </Background>
